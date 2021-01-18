@@ -1,2 +1,2 @@
 # fiji
-Options strategy backtest using CBOE End-of-Day Option Quotes with Calcs
+Options strategy backtest using Cboe End-of-Day Option Quotes with Calcs
