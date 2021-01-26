@@ -1,0 +1,5 @@
+
+
+mysql-url=jdbc:mysql://localhost:3306/fiji
+mysql-user=root
+mysql-pass=<pass here>
