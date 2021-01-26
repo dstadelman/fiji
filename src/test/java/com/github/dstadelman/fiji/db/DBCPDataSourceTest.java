@@ -1,4 +1,4 @@
-package com.github.ruffbytes.fiji.db;
+package com.github.dstadelman.fiji.db;
 
 import static org.junit.Assert.assertTrue;
 

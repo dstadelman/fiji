@@ -1,4 +1,4 @@
-package com.github.ruffbytes.fiji;
+package com.github.dstadelman.fiji;
 
 import static org.junit.Assert.assertTrue;
 
