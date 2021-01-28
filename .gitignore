@@ -12,6 +12,6 @@ target
 .project
 .settings
 .vscode
-src/main/resources/app.properties
 
-src/test/resources/app.properties
+# no properties
+app.properties
