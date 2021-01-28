@@ -1,4 +1,4 @@
-DROP TABLE `quotes`;
+DROP TABLE IF EXISTS `quotes`;
 
 CREATE TABLE `quotes` (
   `idquotes` int NOT NULL AUTO_INCREMENT,
