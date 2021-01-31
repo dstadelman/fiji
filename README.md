@@ -27,9 +27,14 @@ https://datashop.cboe.com/option-quotes-end-of-day-with-calcs
 
 https://python-backtest.blogspot.com/2019/10/cboe-data-review.html?m=1
 
-### MySQL on Windows
+### MySQL
 
 https://dev.mysql.com/doc/mysql-windows-excerpt/5.7/en/windows-installation.html
+https://dev.mysql.com/doc/refman/8.0/en/window-functions-usage.html
+https://levelup.gitconnected.com/how-and-when-to-write-mysql-subqueries-8d5d580b1729
+
+JOIN table to itself 
+SELECT * FROM a AS a1, a AS a2 WHERE a1.price - a2.price = x
 
 ### Java Reference
 
