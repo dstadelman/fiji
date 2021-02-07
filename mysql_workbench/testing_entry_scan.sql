@@ -1,6 +1,6 @@
 ## SHORT_PUT
 SELECT * FROM (
-SELECT quote_date, root, expiration, strike, active_underlying_price_1545, option_type, bid_1545, ask_1545, delta_1545, theta_1545
+SELECT idquotes, quote_date, root, expiration, strike, active_underlying_price_1545, option_type, bid_1545, ask_1545, delta_1545, theta_1545
 	, DATEDIFF(expiration, quote_date) AS DTE
 	, RANK() OVER (PARTITION BY expiration ORDER BY 
 		ABS(DATEDIFF(expiration, quote_date) - 45)
@@ -15,11 +15,11 @@ SELECT quote_date, root, expiration, strike, active_underlying_price_1545, optio
 		-- AND expiration >= "2020-01-03" AND expiration <= "2020-12-31" -- LIMIT RESULTS
 ) sub
 WHERE expiration_rank = 1
-ORDER BY expiration;
+ORDER BY quote_date;
 
 ## STRANGLE
 SELECT * FROM (
-SELECT quote_date, root, expiration, strike, active_underlying_price_1545, option_type, bid_1545, ask_1545, delta_1545, theta_1545
+SELECT idquotes, quote_date, root, expiration, strike, active_underlying_price_1545, option_type, bid_1545, ask_1545, delta_1545, theta_1545
 	, DATEDIFF(expiration, quote_date) AS DTE
 	, RANK() OVER (PARTITION BY expiration ORDER BY 
 		ABS(DATEDIFF(expiration, quote_date) - 45)
@@ -37,11 +37,13 @@ SELECT quote_date, root, expiration, strike, active_underlying_price_1545, optio
 		-- AND expiration >= "2020-01-03" AND expiration <= "2020-12-31" -- LIMIT RESULTS
 ) sub
 WHERE expiration_rank_delta_low = 1 OR expiration_rank_delta_high = 1
-ORDER BY expiration;
+ORDER BY quote_date;
 
 ## IRON_CONDOR
 -- not complete
-SELECT quotesA.quote_date, quotesA.root, 
+SELECT
+	quotesA.idquotes AS idquotesA, quotesB.idquotes AS idquotesB,
+	quotesA.quote_date, quotesA.root, 
 	quotesA.expiration AS expirationA, 
 	quotesB.expiration AS expirationB, 
 	quotesA.strike AS strikeA, quotesB.strike AS strikeB, 
