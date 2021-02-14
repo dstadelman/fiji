@@ -1,6 +1,8 @@
-package com.github.dstadelman.fiji.entity;
+package com.github.dstadelman.fiji.dbmodel;
 
-class Quote {
+import java.util.Date;
+
+public class DBQuote {
     public int idquotes;
     public String underlying_symbol;
     public Date quote_date;

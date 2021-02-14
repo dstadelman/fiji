@@ -1,6 +1,6 @@
-package com.github.dstadelman.fiji.entity;
+package com.github.dstadelman.fiji.dbmodel;
 
-class Trade {
+public class DBTrade {
     public int idtrades;
     public int idstrategies;
     public int shares;
@@ -12,6 +12,7 @@ class Trade {
     public int exit_leg1_idquotes;
     public int exit_leg2_idquotes;
     public int exit_leg3_idquotes;
+    public float max_loss;
     public float max_drawdown;
     public float pnl;
 }

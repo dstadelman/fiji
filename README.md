@@ -40,9 +40,15 @@ SELECT * FROM a AS a1, a AS a2 WHERE a1.price - a2.price = x
 
 https://www.baeldung.com/java-connect-mysql
 https://www.baeldung.com/thread-pool-java-and-guava
-https://stackoverflow.com/questions/5272966/jfreechart-image
-http://hibernatepojoge.sourceforge.net
 https://www.baeldung.com/java-properties
+https://www.baeldung.com/jackson-object-mapper-tutorial
+
+https://stackoverflow.com/questions/5272966/jfreechart-image
+https://www.tutorialspoint.com/jfreechart/jfreechart_line_chart.htm
+https://www.boraji.com/jfreechart-time-series-chart-example
+
+http://hibernatepojoge.sourceforge.net
+
 https://www.baeldung.com/a-simple-guide-to-connection-pooling-in-java
 https://spring.io/projects/spring-cloud-dataflow
 

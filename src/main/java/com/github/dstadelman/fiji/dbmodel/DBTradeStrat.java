@@ -1,6 +1,6 @@
-package com.github.dstadelman.fiji.entity;
+package com.github.dstadelman.fiji.dbmodel;
 
-class Strategy {
+public class DBTradeStrat {
     public int idstrategies;
     public String name;
     public String description;
