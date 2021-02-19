@@ -18,7 +18,7 @@ public class DBControllerTest {
     {
         Connection c = DBCPDataSource.getConnection();
 
-        String sql = "SELECT " + DBController.columnsQuote("quotesA") + ", " + DBController.columnsQuote("quotesB") 
+        String sql = "SELECT " + DBQuoteController.quoteColumns("quotesA") + ", " + DBQuoteController.quoteColumns("quotesB") 
             + " FROM quotes AS quotesA, quotes AS quotesB"
             + " WHERE quotesA.idquotes = 1 AND quotesB.idquotes = 2 LIMIT 1;";
 
@@ -28,8 +28,8 @@ public class DBControllerTest {
         boolean foundOne = false;
         while (rs.next())
         {
-            Quote quoteA = DBController.loadQuote("quotesA", rs);
-            Quote quoteB = DBController.loadQuote("quotesB", rs);
+            Quote quoteA = DBQuoteController.quoteLoad("quotesA", rs);
+            Quote quoteB = DBQuoteController.quoteLoad("quotesB", rs);
             System.out.println(quoteA.root);
             System.out.println(quoteB.root);
             assertTrue("RUT".equals(quoteA.root));
