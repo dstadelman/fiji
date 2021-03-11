@@ -11,7 +11,7 @@ import com.github.dstadelman.fiji.entities.Quote;
 
 import org.junit.Test;
 
-public class DBControllerTest {
+public class DBQuoteControllerTest {
 
     @Test
     public void selectLoadQuote() throws Exception

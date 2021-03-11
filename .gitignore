@@ -15,3 +15,4 @@ target
 
 # no properties
 app.properties
+hibernate.cfg.xml

@@ -42,6 +42,7 @@ https://www.baeldung.com/java-connect-mysql
 https://www.baeldung.com/thread-pool-java-and-guava
 https://www.baeldung.com/java-properties
 https://www.baeldung.com/jackson-object-mapper-tutorial
+https://www.baeldung.com/hibernate-criteria-queries
 
 https://stackoverflow.com/questions/5272966/jfreechart-image
 https://www.tutorialspoint.com/jfreechart/jfreechart_line_chart.htm
@@ -56,9 +57,12 @@ https://spring.io/projects/spring-cloud-dataflow
 
 https://en.wikipedia.org/wiki/Sharpe_ratio
 
-## MySQL Table Creation
+## MySQL Table Creation / Operations
 
-* Create `quotes` table: `mysql_workbench/quotes_create.sql`
+* Create tables
+   * Create `quotes` table: `mysql_workbench/quotes_create.sql`
+   * Create `tradestrats` table: `mysql_workbench/tradestrats_create.sql`
+   * Create `trades` table: `mysql_workbench/trades_create.sql`
 * Sample CSV import: `mysql_workbench/quotes_import_csv.sql`
 * Bash script to make SQL file to insert all CSV files into database (use Git Bash include in Git for Windows): `mysql_workbench/quotes_import_csv.sh`
 
@@ -67,4 +71,4 @@ Some operations are slow and MySQL Workbench gives up: https://stackoverflow.com
 * For me it was under Edit → Preferences → SQL Editor → DBMS connection read time out (in seconds): 600 - Changed the value to 6000.
 * Also unchecked limit rows as putting a limit in every time I want to search the whole data set gets tiresome.
 
-I changed all values to 0 in this dialog as MySQL database is local and I don't mind waiting.
+All values to 0 in this dialog as MySQL database is local and I don't mind waiting.
