@@ -13,8 +13,8 @@ public class Trade {
 
     @Column public Integer idtradestrats;
 
-    @Column public Integer outright_idquotes;
-    @Column public Integer outright_quantity;
+    @Column public Integer entry_outright_idquotes;
+    @Column public Integer entry_outright_quantity;
     @Column public Integer entry_legA_idquotes;
     @Column public Integer entry_legA_quantity;
     @Column public Integer entry_legB_idquotes;
@@ -23,6 +23,8 @@ public class Trade {
     @Column public Integer entry_legC_quantity;
     @Column public Integer entry_legD_idquotes;
     @Column public Integer entry_legD_quantity;
+    @Column public Integer exit_outright_idquotes;
+    @Column public Integer exit_outright_quantity;        
     @Column public Integer exit_legA_idquotes;
     @Column public Integer exit_legA_quantity;
     @Column public Integer exit_legB_idquotes;
