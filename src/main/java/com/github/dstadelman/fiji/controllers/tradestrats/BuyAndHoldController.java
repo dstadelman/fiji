@@ -51,7 +51,7 @@ public class BuyAndHoldController implements ITradeStratController {
             ps.setString(1, tstrat.root);
             ResultSet rs = ps.executeQuery();
 
-            boolean foundOne = false;
+            // boolean foundOne = false;
             //while (rs.next())
             if (!rs.next())
                 throw new Exception("No quotes returned.");
@@ -69,7 +69,7 @@ public class BuyAndHoldController implements ITradeStratController {
             ps.setString(1, tstrat.root);
             ResultSet rs = ps.executeQuery();
 
-            boolean foundOne = false;
+            // boolean foundOne = false;
             //while (rs.next())
             if (!rs.next())
                 throw new Exception("No quotes returned.");
