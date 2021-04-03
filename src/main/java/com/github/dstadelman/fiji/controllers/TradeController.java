@@ -1,12 +1,25 @@
 package com.github.dstadelman.fiji.controllers;
 
+import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.Date;
 
+import com.github.dstadelman.fiji.controllers.DBQuoteController.QuoteNotFoundException;
+import com.github.dstadelman.fiji.entities.Quote;
 import com.github.dstadelman.fiji.entities.QuoteMap;
 import com.github.dstadelman.fiji.entities.Trade;
 
 public class TradeController {
+
+    public static class IllegalTradeException extends Exception {
+
+        private static final long serialVersionUID = 6717183296952630218L;
+
+        public IllegalTradeException(String message) {
+            super(message);
+        }
+
+    }
 
     public static class QuoteDateTradeComparator implements Comparator<Trade> {
 
@@ -52,6 +65,166 @@ public class TradeController {
 
             return a_d.compareTo(b_d);
         }
+    }
+
+    public static float tradeValueEntry(Trade t) throws QuoteNotFoundException, SQLException {
+
+        float value = 0;
+        
+        Quote outright = DBQuoteController.getQuote(t.entry_outright_idquotes);
+        if (outright != null && t.entry_outright_quantity != null) {
+            value += DBQuoteController.valueMid1545_outright(outright, t.entry_outright_quantity);
+        }
+
+        Quote legA = DBQuoteController.getQuote(t.entry_legA_idquotes);
+        if (legA != null && t.entry_legA_quantity != null) {
+            value += DBQuoteController.valueMid1545_leg(legA, t.entry_legA_quantity);
+        }
+
+        Quote legB = DBQuoteController.getQuote(t.entry_legB_idquotes);
+        if (legB != null && t.entry_legB_quantity != null) {
+            value += DBQuoteController.valueMid1545_leg(legB, t.entry_legB_quantity);
+        }        
+
+        Quote legC = DBQuoteController.getQuote(t.entry_legC_idquotes);
+        if (legC != null && t.entry_legC_quantity != null) {
+            value += DBQuoteController.valueMid1545_leg(legC, t.entry_legC_quantity);
+        }
+
+        Quote legD = DBQuoteController.getQuote(t.entry_legD_idquotes);
+        if (legD != null && t.entry_legD_quantity != null) {
+            value += DBQuoteController.valueMid1545_leg(legD, t.entry_legD_quantity);
+        }        
+
+        return value;
     }    
+
+    public static float tradeValueExit(Trade t) throws QuoteNotFoundException, SQLException {
+
+        float value = 0;
+        
+        Quote outright = DBQuoteController.getQuote(t.exit_outright_idquotes);
+        if (outright != null && t.exit_outright_quantity != null) {
+            value += DBQuoteController.valueMid1545_outright(outright, t.exit_outright_quantity);
+        }
+
+        Quote legA = DBQuoteController.getQuote(t.exit_legA_idquotes);
+        if (legA != null && t.exit_legA_quantity != null) {
+            value += DBQuoteController.valueMid1545_leg(legA, t.exit_legA_quantity);
+        }
+
+        Quote legB = DBQuoteController.getQuote(t.exit_legB_idquotes);
+        if (legB != null && t.exit_legB_quantity != null) {
+            value += DBQuoteController.valueMid1545_leg(legB, t.exit_legB_quantity);
+        }        
+
+        Quote legC = DBQuoteController.getQuote(t.exit_legC_idquotes);
+        if (legC != null && t.exit_legC_quantity != null) {
+            value += DBQuoteController.valueMid1545_leg(legC, t.exit_legC_quantity);
+        }
+
+        Quote legD = DBQuoteController.getQuote(t.exit_legD_idquotes);
+        if (legD != null && t.exit_legD_quantity != null) {
+            value += DBQuoteController.valueMid1545_leg(legD, t.exit_legD_quantity);
+        }        
+
+        return value;
+    }    
+
+    public static void validateTrade_Leg(Integer entry_idquotes, Integer entry_quantity, Integer exit_idquotes, Integer exit_quantity, QuoteMap quoteMap, String description) throws IllegalTradeException, QuoteNotFoundException, SQLException {
+
+        if (entry_idquotes == null && entry_quantity == null && exit_idquotes == null && exit_quantity == null) {
+            return; // everything is null and OK
+        }
+
+        if (entry_idquotes == null) {
+            throw new IllegalTradeException(description + ": entry is null (" + entry_idquotes + ")");
+        }
+        if (entry_quantity == null) {
+            throw new IllegalTradeException(description + ": entry quantity is null (" + entry_idquotes + ")");
+        }        
+        if (exit_idquotes == null) {
+            throw new IllegalTradeException(description + ": exit is null (" + exit_idquotes + ")");
+        }
+        if (exit_quantity == null) {
+            throw new IllegalTradeException(description + ": exit quantity is null (" + exit_idquotes + ")");
+        }
+
+        // make sure the quantity matches
+        // this seems dumb right now, but perhaps in the future this structure handles partial close of a position
+        if  (entry_quantity != -1 * exit_quantity) {
+            throw new IllegalTradeException(description + ": entry and exit quantity does not match (" + entry_quantity + ", " + exit_quantity + ")");
+        }
+
+        Quote entry = DBQuoteController.getQuote(entry_idquotes, quoteMap);
+        Quote exit = DBQuoteController.getQuote(exit_idquotes, quoteMap);
+
+        if (entry == null) {
+            throw new IllegalTradeException(description + ": entry quote is not found (" + entry_idquotes + ")");
+        }
+
+        if (exit == null) {
+            throw new IllegalTradeException(description + ": exit quote is not found (" + exit_idquotes + ")");
+        }        
+
+        if (!entry.root.equals(exit.root)) {
+            throw new IllegalTradeException(description + ": root does not match (" + entry_idquotes + ", " + exit_idquotes + ")");
+        }
+
+        if (!entry.underlying_symbol.equals(exit.underlying_symbol)) {
+            throw new IllegalTradeException(description + ": underlying_symbol does not match (" + entry_idquotes + ", " + exit_idquotes + ")");
+        }
+
+        if (entry.strike != exit.strike) {
+            throw new IllegalTradeException(description + ": strike does not match (" + entry_idquotes + ", " + exit_idquotes + ")");
+        }
+
+    }    
+
+    public static void validateTrade(Trade t, QuoteMap quoteMap) throws IllegalTradeException, QuoteNotFoundException, SQLException {
+
+        if (t.entry_outright_idquotes != null || t.entry_outright_quantity != null || t.exit_outright_idquotes != null || t.exit_outright_quantity != null) {
+         
+            // the outright needs to be checked
+
+            if (t.entry_outright_idquotes == null) {
+                throw new IllegalTradeException("outright: entry is null (" + t.entry_outright_idquotes + ")");
+            }
+            if (t.entry_outright_quantity == null) {
+                throw new IllegalTradeException("outright: entry quantity is null (" + t.entry_outright_idquotes + ")");
+            }        
+            if (t.exit_outright_idquotes == null) {
+                throw new IllegalTradeException("outright: exit is null (" + t.exit_outright_idquotes + ")");
+            }
+            if (t.exit_outright_quantity == null) {
+                throw new IllegalTradeException("outright: exit quantity is null (" + t.exit_outright_idquotes + ")");
+            }
+
+            // make sure the quantity matches
+            // this seems dumb right now, but perhaps in the future this structure handles partial close of a position
+            if  (t.entry_outright_quantity != -1 * t.exit_outright_quantity) {
+                throw new IllegalTradeException("outright: entry and exit quantity does not match (" + t.entry_outright_quantity + ", " + t.exit_outright_quantity + ")");
+            }            
+
+            Quote entry = DBQuoteController.getQuote(t.entry_outright_idquotes, quoteMap);
+            Quote exit = DBQuoteController.getQuote(t.exit_outright_idquotes, quoteMap);
+    
+            if (entry == null) {
+                throw new IllegalTradeException("outright: entry quote is not found (" + t.entry_outright_idquotes + ")");
+            }
+    
+            if (exit == null) {
+                throw new IllegalTradeException("outright: exit quote is not found (" + t.exit_outright_idquotes + ")");
+            }        
+    
+            if (!entry.root.equals(exit.root)) {
+                throw new IllegalTradeException("outright: root does not match (" + t.entry_outright_idquotes + ", " + t.exit_outright_idquotes + ")");
+            }
+    
+            if (!entry.underlying_symbol.equals(exit.underlying_symbol)) {
+                throw new IllegalTradeException("outright: underlying_symbol does not match (" + t.entry_outright_idquotes + ", " + t.exit_outright_idquotes + ")"););
+            }
+        }
+    }
     
 }

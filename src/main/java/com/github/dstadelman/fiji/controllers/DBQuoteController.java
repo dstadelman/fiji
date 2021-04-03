@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 import com.github.dstadelman.fiji.db.DBCPDataSource;
 import com.github.dstadelman.fiji.entities.Quote;
+import com.github.dstadelman.fiji.entities.QuoteMap;
 
 public class DBQuoteController extends DBController {
 
@@ -23,7 +24,7 @@ public class DBQuoteController extends DBController {
         }
     }
 
-    public static Quote getQuote(int idquotes) throws QuoteNotFoundException, SQLException {
+    protected static Quote getQuote(int idquotes) throws QuoteNotFoundException, SQLException {
         Connection c = DBCPDataSource.getConnection();
 
         String sql = "SELECT " + DBQuoteController.quoteColumns(null)
@@ -41,6 +42,17 @@ public class DBQuoteController extends DBController {
         }
         throw new QuoteNotFoundException(idquotes);
     }
+
+    public static Quote getQuote(int idquotes, QuoteMap quoteMap) throws QuoteNotFoundException, SQLException {
+        
+        if (quoteMap.containsKey(idquotes)) {
+            return quoteMap.get(idquotes);
+        }
+
+        Quote q = getQuote(idquotes);
+        quoteMap.put(idquotes, q);
+        return quoteMap.get(idquotes);
+    }    
     
     public static String quoteColumns(String table) {
 
@@ -169,24 +181,16 @@ public class DBQuoteController extends DBController {
         return q;
     }
 
-    public float valueMid1545_leg(Quote leg, int leg_quantity) {
+    public static float valueMid1545_leg(Quote leg, int leg_quantity) {
         if (leg != null) 
             return leg.mid_1545 * leg_quantity;
         return 0;
     }
 
-    public float valueMid1545_outright(Quote outright, int outright_quantity) {
+    public static float valueMid1545_outright(Quote outright, int outright_quantity) {
         if (outright != null) 
             return outright.underlying_mid_1545 * outright_quantity;
         return 0;
-    }    
-
-    public float valueMid1545(Quote outright, int outright_quantity, Quote legA, int legA_quantity, Quote legB, int legB_quantity, Quote legC, int legC_quantity, Quote legD, int legD_quantity) {
-        return  valueMid1545_outright(outright, outright_quantity)
-            +   valueMid1545_leg(legA, legA_quantity)
-            +   valueMid1545_leg(legB, legB_quantity)
-            +   valueMid1545_leg(legC, legC_quantity)
-            +   valueMid1545_leg(legD, legD_quantity);
     }
 
 }

@@ -3,7 +3,7 @@ package com.github.dstadelman.fiji.controllers;
 import java.util.List;
 
 import com.github.dstadelman.fiji.entities.Trade;
-import com.github.dstadelman.fiji.entities.PortfolioStratResult;
+import com.github.dstadelman.fiji.entities.PortfolioTrade;
 
 import java.sql.SQLException;
 
@@ -11,5 +11,5 @@ import com.github.dstadelman.fiji.controllers.DBQuoteController.QuoteNotFoundExc
 import com.github.dstadelman.fiji.entities.QuoteMap;
 
 public interface IPortfolioStratController {
-    public PortfolioStratResult generate(List<Trade> trades, QuoteMap quoteMap) throws SQLException, QuoteNotFoundException;
+    public List<PortfolioTrade> generate(List<Trade> trades, QuoteMap quoteMap) throws SQLException, QuoteNotFoundException;
 }
