@@ -1,33 +1,20 @@
 package com.github.dstadelman.fiji.controllers.tradestrats;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.github.dstadelman.fiji.controllers.DBQuoteController;
+import com.github.dstadelman.fiji.controllers.DBQuoteController.QuoteNotFoundException;
 import com.github.dstadelman.fiji.controllers.ITradeStratController;
-import com.github.dstadelman.fiji.entities.Quote;
-import com.github.dstadelman.fiji.entities.Trade;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.List;
-
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
 import com.github.dstadelman.fiji.db.DBCPDataSource;
 import com.github.dstadelman.fiji.entities.Quote;
-import com.github.dstadelman.fiji.entities.TradeStrat;
+import com.github.dstadelman.fiji.entities.QuoteMap;
+import com.github.dstadelman.fiji.entities.Trade;
 import com.github.dstadelman.fiji.entities.tradestrats.BuyAndHold;
-
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
-
 
 public class BuyAndHoldController implements ITradeStratController {
 
@@ -38,7 +25,7 @@ public class BuyAndHoldController implements ITradeStratController {
     }
 
     @Override
-    public List<Trade> generate() throws Exception {
+    public List<Trade> generate(QuoteMap quoteMap) throws SQLException, QuoteNotFoundException {
 
         Trade t = new Trade();
 
@@ -51,15 +38,15 @@ public class BuyAndHoldController implements ITradeStratController {
             ps.setString(1, tstrat.root);
             ResultSet rs = ps.executeQuery();
 
-            // boolean foundOne = false;
-            //while (rs.next())
             if (!rs.next())
-                throw new Exception("No quotes returned.");
+                throw new QuoteNotFoundException("could not find entry outright");
 
-            Quote quoteA = DBQuoteController.quoteLoad(null, rs);
+            Quote quote = DBQuoteController.quoteLoad(null, rs);
 
-            t.entry_legA_idquotes = quoteA.idquotes;
-            t.entry_legA_quantity = 1;
+            quoteMap.put(quote.idquotes, quote);
+
+            t.entry_outright_idquotes = quote.idquotes;
+            t.entry_outright_quantity = 1;
         }
 
         {
@@ -69,15 +56,15 @@ public class BuyAndHoldController implements ITradeStratController {
             ps.setString(1, tstrat.root);
             ResultSet rs = ps.executeQuery();
 
-            // boolean foundOne = false;
-            //while (rs.next())
             if (!rs.next())
-                throw new Exception("No quotes returned.");
+                throw new QuoteNotFoundException("could not find exit outright");
 
-            Quote quoteA = DBQuoteController.quoteLoad(null, rs);
+            Quote quote = DBQuoteController.quoteLoad(null, rs);
 
-            t.entry_legA_idquotes = quoteA.idquotes;
-            t.entry_legA_quantity = -1;
+            quoteMap.put(quote.idquotes, quote);
+
+            t.exit_outright_idquotes = quote.idquotes;
+            t.exit_outright_quantity = -1;
         }      
         
         List<Trade> trades = new ArrayList<Trade>();

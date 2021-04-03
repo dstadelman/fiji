@@ -12,12 +12,15 @@ import javax.persistence.criteria.Root;
 import com.github.dstadelman.fiji.controllers.DBController;
 import com.github.dstadelman.fiji.controllers.DBQuoteController;
 import com.github.dstadelman.fiji.controllers.IPortfolioStratController;
+import com.github.dstadelman.fiji.controllers.DBQuoteController.QuoteNotFoundException;
+import com.github.dstadelman.fiji.controllers.TradeController.QuoteDateTradeComparator;
 import com.github.dstadelman.fiji.entities.Trade;
-import com.github.dstadelman.fiji.entities.TradingSystemResult;
+import com.github.dstadelman.fiji.entities.PortfolioStratResult;
 import com.github.dstadelman.fiji.entities.portfoliostrats.FullAllocation;
 
 import com.github.dstadelman.fiji.db.DBCPDataSource;
 import com.github.dstadelman.fiji.entities.Quote;
+import com.github.dstadelman.fiji.entities.QuoteMap;
 import com.github.dstadelman.fiji.entities.TradeStrat;
 
 import org.hibernate.Criteria;
@@ -30,7 +33,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class FullAllocationController extends PortfolioStratBase implements IPortfolioStratController {
+import java.sql.SQLException;
+
+import com.github.dstadelman.fiji.controllers.DBQuoteController.QuoteNotFoundException;
+import com.github.dstadelman.fiji.entities.Quote;
+import com.github.dstadelman.fiji.entities.QuoteMap;
+
+public class FullAllocationController implements IPortfolioStratController {
 
     public FullAllocation fullAllocation;
 
@@ -39,14 +48,12 @@ public class FullAllocationController extends PortfolioStratBase implements IPor
     }
 
     @Override
-    public TradingSystemResult execute(List<Trade> trades) throws Exception {
+    public PortfolioStratResult generate(List<Trade> trades, QuoteMap quoteMap) throws SQLException, QuoteNotFoundException {
 
-        TradingSystemResult r = new TradingSystemResult();
+        PortfolioStratResult r = new PortfolioStratResult();
 
         float cash      = fullAllocation.initial_capital;
         float net_liq   = fullAllocation.initial_capital;
-
-        final Map<Integer, Quote> quoteMap = getQuoteMap(trades);
 
         trades.stream().sorted(new QuoteDateTradeComparator(quoteMap))
         .forEach(t -> {

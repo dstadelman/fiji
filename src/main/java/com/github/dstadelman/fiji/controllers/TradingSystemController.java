@@ -1,12 +1,16 @@
 package com.github.dstadelman.fiji.controllers;
 
-import java.util.List;
-
-import com.github.dstadelman.fiji.entities.Trade;
-import com.github.dstadelman.fiji.entities.TradingSystemResult;
+import com.github.dstadelman.fiji.entities.QuoteMap;
+import com.github.dstadelman.fiji.entities.PortfolioStratResult;
 
 public class TradingSystemController {
-    public static TradingSystemResult execute(ITradeStratController tradeStrat, IPortfolioStratController portfolioStrat) throws Exception {
-        return portfolioStrat.execute(tradeStrat.generate());
+    public static PortfolioStratResult execute(ITradeStratController tradeStrat, IPortfolioStratController portfolioStrat) {
+
+        QuoteMap quoteMap = new QuoteMap();
+        return null;
+
+        //return portfolioStrat.execute(tradeStrat.generate());
     }
+
+
 }

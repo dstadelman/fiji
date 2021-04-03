@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import com.github.dstadelman.fiji.db.DBCPDataSource;
 import com.github.dstadelman.fiji.entities.Quote;
@@ -14,7 +15,7 @@ import org.junit.Test;
 public class DBQuoteControllerTest {
 
     @Test
-    public void selectLoadQuote() throws Exception
+    public void selectLoadQuote() throws SQLException 
     {
         Connection c = DBCPDataSource.getConnection();
 

@@ -1,5 +1,10 @@
 # fiji
-Options strategy backtest using *Cboe End-of-Day Option Quotes with Calcs*
+
+Options strategy backtest framework using *Cboe End-of-Day Option Quotes with Calcs*
+
+Framework supports underlying with four legs of options.
+
+Fiji is tightly coupled with hibernate + MySQL 8 queries - a little gross, but speed of implementation was considered over "really nice code." Expect hibernate and MySQL 8 all over the code base!
 
 ## DISCLAIMER 
 
@@ -72,3 +77,4 @@ Some operations are slow and MySQL Workbench gives up: https://stackoverflow.com
 * Also unchecked limit rows as putting a limit in every time I want to search the whole data set gets tiresome.
 
 All values to 0 in this dialog as MySQL database is local and I don't mind waiting.
+
