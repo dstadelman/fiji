@@ -3,6 +3,7 @@ package com.github.dstadelman.fiji.controllers.portfoliostrats;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -49,6 +50,30 @@ public class FullAllocationController extends PortfolioStratBase implements IPor
 
         trades.stream().sorted(new QuoteDateTradeComparator(quoteMap))
         .forEach(t -> {
+
+            Quote entry_outright = quoteMap.get(t.entry_outright_idquotes);
+            Quote entry_legA = quoteMap.get(t.entry_legA_idquotes);
+            Quote entry_legB = quoteMap.get(t.entry_legB_idquotes);
+            Quote entry_legC = quoteMap.get(t.entry_legC_idquotes);
+            Quote entry_legD = quoteMap.get(t.entry_legD_idquotes);
+
+            // ****************************************************************
+            // buying
+
+            // first calculate the cost of a single
+            // not sure how to do some sort of margin requirement here
+            float capital_required_single = 0; // 
+
+            //if (entry_outright != null)
+                // 
+            
+
+            Quote exit_outright = quoteMap.get(t.exit_outright_idquotes);
+            Quote exit_legA = quoteMap.get(t.exit_legA_idquotes);
+            Quote exit_legB = quoteMap.get(t.exit_legB_idquotes);
+            Quote exit_legC = quoteMap.get(t.exit_legC_idquotes);
+            Quote exit_legD = quoteMap.get(t.exit_legD_idquotes);
+
             
         });
 
