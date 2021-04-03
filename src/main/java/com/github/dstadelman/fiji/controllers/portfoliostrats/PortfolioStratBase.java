@@ -34,6 +34,8 @@ public class PortfolioStratBase {
         @Override
         public int compare(Trade a, Trade b) {
             
+            // return the trade with the earliest entry date, and then earliest exit date
+
             Date a_d = null;
             Date b_d = null;
 
