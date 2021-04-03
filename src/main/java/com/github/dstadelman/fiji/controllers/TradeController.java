@@ -67,31 +67,127 @@ public class TradeController {
         }
     }
 
-    public static float tradeValueEntry(Trade t) throws QuoteNotFoundException, SQLException {
+    public static Date dateOfEarliestEntry(Trade t, QuoteMap quoteMap) throws QuoteNotFoundException, SQLException {
+
+        Date earliest = null;
+
+        if (t.entry_outright_idquotes != null) {
+            Quote entry = DBQuoteController.getQuote(t.entry_outright_idquotes, quoteMap);
+            earliest = (earliest == null) ? entry.quote_date : (earliest.before(entry.quote_date)) ? earliest : entry.quote_date;
+        }
+
+        if (t.entry_legA_idquotes != null) {
+            Quote entry = DBQuoteController.getQuote(t.entry_legA_idquotes, quoteMap);
+            earliest = (earliest == null) ? entry.quote_date : (earliest.before(entry.quote_date)) ? earliest : entry.quote_date;
+        }
+
+        if (t.entry_legB_idquotes != null) {
+            Quote entry = DBQuoteController.getQuote(t.entry_legB_idquotes, quoteMap);
+            earliest = (earliest == null) ? entry.quote_date : (earliest.before(entry.quote_date)) ? earliest : entry.quote_date;
+        }
+
+        if (t.entry_legC_idquotes != null) {
+            Quote entry = DBQuoteController.getQuote(t.entry_legC_idquotes, quoteMap);
+            earliest = (earliest == null) ? entry.quote_date : (earliest.before(entry.quote_date)) ? earliest : entry.quote_date;
+        }
+
+        if (t.entry_legD_idquotes != null) {
+            Quote entry = DBQuoteController.getQuote(t.entry_legD_idquotes, quoteMap);
+            earliest = (earliest == null) ? entry.quote_date : (earliest.before(entry.quote_date)) ? earliest : entry.quote_date;
+        }
+
+        return earliest;
+    }
+
+    public static Date dateOfLatestExit(Trade t, QuoteMap quoteMap) throws QuoteNotFoundException, SQLException {
+
+        Date latest = null;
+
+        if (t.exit_outright_idquotes != null) {
+            Quote exit = DBQuoteController.getQuote(t.exit_outright_idquotes, quoteMap);
+            latest = (latest == null) ? exit.quote_date : (latest.after(exit.quote_date)) ? latest : exit.quote_date;
+        }
+
+        if (t.exit_legA_idquotes != null) {
+            Quote exit = DBQuoteController.getQuote(t.exit_legA_idquotes, quoteMap);
+            latest = (latest == null) ? exit.quote_date : (latest.after(exit.quote_date)) ? latest : exit.quote_date;
+        }
+
+        if (t.exit_legB_idquotes != null) {
+            Quote exit = DBQuoteController.getQuote(t.exit_legB_idquotes, quoteMap);
+            latest = (latest == null) ? exit.quote_date : (latest.after(exit.quote_date)) ? latest : exit.quote_date;
+        }
+
+        if (t.exit_legC_idquotes != null) {
+            Quote exit = DBQuoteController.getQuote(t.exit_legC_idquotes, quoteMap);
+            latest = (latest == null) ? exit.quote_date : (latest.after(exit.quote_date)) ? latest : exit.quote_date;
+        }
+
+        if (t.exit_legD_idquotes != null) {
+            Quote exit = DBQuoteController.getQuote(t.exit_legD_idquotes, quoteMap);
+            latest = (latest == null) ? exit.quote_date : (latest.after(exit.quote_date)) ? latest : exit.quote_date;
+        }
+
+        return latest;
+    }
+
+    public static float marginReq(Trade t, QuoteMap quoteMap, float margin_requirement_percent_options, float outright_margin_multiplier) throws QuoteNotFoundException, SQLException {
+        
+        float value = 0;
+        
+        Quote outright = DBQuoteController.getQuote(t.entry_outright_idquotes, quoteMap);
+        if (outright != null && t.entry_outright_quantity != null) {
+            value += (1 / outright_margin_multiplier) * DBQuoteController.valueMid1545_outright(outright, t.entry_outright_quantity);
+        }
+
+        Quote legA = DBQuoteController.getQuote(t.entry_legA_idquotes, quoteMap);
+        if (legA != null && t.entry_legA_quantity != null) {
+            value += margin_requirement_percent_options * legA.strike;
+        }
+
+        Quote legB = DBQuoteController.getQuote(t.entry_legB_idquotes, quoteMap);
+        if (legB != null && t.entry_legB_quantity != null) {
+            value += margin_requirement_percent_options * legB.strike;
+        }        
+
+        Quote legC = DBQuoteController.getQuote(t.entry_legC_idquotes, quoteMap);
+        if (legC != null && t.entry_legC_quantity != null) {
+            value += margin_requirement_percent_options * legC.strike;
+        }
+
+        Quote legD = DBQuoteController.getQuote(t.entry_legD_idquotes, quoteMap);
+        if (legD != null && t.entry_legD_quantity != null) {
+            value += margin_requirement_percent_options * legD.strike;
+        }        
+
+        return value;
+    }        
+
+    public static float tradeValueEntry(Trade t, QuoteMap quoteMap) throws QuoteNotFoundException, SQLException {
 
         float value = 0;
         
-        Quote outright = DBQuoteController.getQuote(t.entry_outright_idquotes);
+        Quote outright = DBQuoteController.getQuote(t.entry_outright_idquotes, quoteMap);
         if (outright != null && t.entry_outright_quantity != null) {
             value += DBQuoteController.valueMid1545_outright(outright, t.entry_outright_quantity);
         }
 
-        Quote legA = DBQuoteController.getQuote(t.entry_legA_idquotes);
+        Quote legA = DBQuoteController.getQuote(t.entry_legA_idquotes, quoteMap);
         if (legA != null && t.entry_legA_quantity != null) {
             value += DBQuoteController.valueMid1545_leg(legA, t.entry_legA_quantity);
         }
 
-        Quote legB = DBQuoteController.getQuote(t.entry_legB_idquotes);
+        Quote legB = DBQuoteController.getQuote(t.entry_legB_idquotes, quoteMap);
         if (legB != null && t.entry_legB_quantity != null) {
             value += DBQuoteController.valueMid1545_leg(legB, t.entry_legB_quantity);
         }        
 
-        Quote legC = DBQuoteController.getQuote(t.entry_legC_idquotes);
+        Quote legC = DBQuoteController.getQuote(t.entry_legC_idquotes, quoteMap);
         if (legC != null && t.entry_legC_quantity != null) {
             value += DBQuoteController.valueMid1545_leg(legC, t.entry_legC_quantity);
         }
 
-        Quote legD = DBQuoteController.getQuote(t.entry_legD_idquotes);
+        Quote legD = DBQuoteController.getQuote(t.entry_legD_idquotes, quoteMap);
         if (legD != null && t.entry_legD_quantity != null) {
             value += DBQuoteController.valueMid1545_leg(legD, t.entry_legD_quantity);
         }        
@@ -99,31 +195,31 @@ public class TradeController {
         return value;
     }    
 
-    public static float tradeValueExit(Trade t) throws QuoteNotFoundException, SQLException {
+    public static float tradeValueExit(Trade t, QuoteMap quoteMap) throws QuoteNotFoundException, SQLException {
 
         float value = 0;
         
-        Quote outright = DBQuoteController.getQuote(t.exit_outright_idquotes);
+        Quote outright = DBQuoteController.getQuote(t.exit_outright_idquotes, quoteMap);
         if (outright != null && t.exit_outright_quantity != null) {
             value += DBQuoteController.valueMid1545_outright(outright, t.exit_outright_quantity);
         }
 
-        Quote legA = DBQuoteController.getQuote(t.exit_legA_idquotes);
+        Quote legA = DBQuoteController.getQuote(t.exit_legA_idquotes, quoteMap);
         if (legA != null && t.exit_legA_quantity != null) {
             value += DBQuoteController.valueMid1545_leg(legA, t.exit_legA_quantity);
         }
 
-        Quote legB = DBQuoteController.getQuote(t.exit_legB_idquotes);
+        Quote legB = DBQuoteController.getQuote(t.exit_legB_idquotes, quoteMap);
         if (legB != null && t.exit_legB_quantity != null) {
             value += DBQuoteController.valueMid1545_leg(legB, t.exit_legB_quantity);
         }        
 
-        Quote legC = DBQuoteController.getQuote(t.exit_legC_idquotes);
+        Quote legC = DBQuoteController.getQuote(t.exit_legC_idquotes, quoteMap);
         if (legC != null && t.exit_legC_quantity != null) {
             value += DBQuoteController.valueMid1545_leg(legC, t.exit_legC_quantity);
         }
 
-        Quote legD = DBQuoteController.getQuote(t.exit_legD_idquotes);
+        Quote legD = DBQuoteController.getQuote(t.exit_legD_idquotes, quoteMap);
         if (legD != null && t.exit_legD_quantity != null) {
             value += DBQuoteController.valueMid1545_leg(legD, t.exit_legD_quantity);
         }        
@@ -167,6 +263,10 @@ public class TradeController {
             throw new IllegalTradeException(description + ": exit quote is not found (" + exit_idquotes + ")");
         }        
 
+        if (!entry.quote_date.before(exit.quote_date)) {
+            throw new IllegalTradeException(description + ": entry quote_date is not before exit quote_date (" + entry_idquotes + ", " + exit_idquotes + ")");
+        }
+
         if (!entry.root.equals(exit.root)) {
             throw new IllegalTradeException(description + ": root does not match (" + entry_idquotes + ", " + exit_idquotes + ")");
         }
@@ -182,6 +282,10 @@ public class TradeController {
     }    
 
     public static void validateTrade(Trade t, QuoteMap quoteMap) throws IllegalTradeException, QuoteNotFoundException, SQLException {
+
+        if (t.entry_outright_idquotes == null && t.entry_legA_idquotes == null && t.entry_legB_idquotes == null && t.entry_legC_idquotes == null && t.entry_legD_idquotes == null) {
+            throw new IllegalTradeException("no entries");
+        }
 
         if (t.entry_outright_idquotes != null || t.entry_outright_quantity != null || t.exit_outright_idquotes != null || t.exit_outright_quantity != null) {
          
@@ -215,16 +319,25 @@ public class TradeController {
     
             if (exit == null) {
                 throw new IllegalTradeException("outright: exit quote is not found (" + t.exit_outright_idquotes + ")");
-            }        
+            }
+
+            if (!entry.quote_date.before(exit.quote_date)) {
+                throw new IllegalTradeException("outright: entry quote_date is not before exit quote_date (" + t.entry_outright_idquotes + ", " + t.exit_outright_idquotes + ")");
+            }
     
             if (!entry.root.equals(exit.root)) {
                 throw new IllegalTradeException("outright: root does not match (" + t.entry_outright_idquotes + ", " + t.exit_outright_idquotes + ")");
             }
     
             if (!entry.underlying_symbol.equals(exit.underlying_symbol)) {
-                throw new IllegalTradeException("outright: underlying_symbol does not match (" + t.entry_outright_idquotes + ", " + t.exit_outright_idquotes + ")"););
+                throw new IllegalTradeException("outright: underlying_symbol does not match (" + t.entry_outright_idquotes + ", " + t.exit_outright_idquotes + ")");
             }
         }
+
+        validateTrade_Leg(t.entry_legA_idquotes, t.entry_legA_quantity, t.exit_legA_idquotes, t.exit_legA_quantity, quoteMap, "legA");
+        validateTrade_Leg(t.entry_legB_idquotes, t.entry_legB_quantity, t.exit_legB_idquotes, t.exit_legB_quantity, quoteMap, "legB");
+        validateTrade_Leg(t.entry_legC_idquotes, t.entry_legC_quantity, t.exit_legC_idquotes, t.exit_legC_quantity, quoteMap, "legC");
+        validateTrade_Leg(t.entry_legD_idquotes, t.entry_legD_quantity, t.exit_legD_idquotes, t.exit_legD_quantity, quoteMap, "legD");
     }
     
 }

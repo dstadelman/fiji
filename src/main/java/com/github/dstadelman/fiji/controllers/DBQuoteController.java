@@ -24,7 +24,7 @@ public class DBQuoteController extends DBController {
         }
     }
 
-    protected static Quote getQuote(int idquotes) throws QuoteNotFoundException, SQLException {
+    private static Quote getQuote(int idquotes) throws QuoteNotFoundException, SQLException {
         Connection c = DBCPDataSource.getConnection();
 
         String sql = "SELECT " + DBQuoteController.quoteColumns(null)

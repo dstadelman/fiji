@@ -1,6 +1,8 @@
 package com.github.dstadelman.fiji.controllers.portfoliostrats;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,39 +27,30 @@ public class FullAllocationController implements IPortfolioStratController {
     @Override
     public List<PortfolioTrade> generate(List<Trade> trades, QuoteMap quoteMap) throws SQLException, QuoteNotFoundException {
 
-        float cash      = fullAllocation.initial_capital;
-        float net_liq   = fullAllocation.initial_capital;
+        float cash = fullAllocation.initial_capital;
+        // float net_liq   = fullAllocation.initial_capital;
 
-        return trades.stream().sorted(new QuoteDateTradeComparator(quoteMap))
-        .map(t -> {
+        List<PortfolioTrade> portfolioTrades = new ArrayList<PortfolioTrade>();
 
-            TradeController.tradeValueEntry(t);
+        Date lastExit = null;
 
-            Quote entry_outright = quoteMap.get(t.entry_outright_idquotes);
-            Quote entry_legA = quoteMap.get(t.entry_legA_idquotes);
-            Quote entry_legB = quoteMap.get(t.entry_legB_idquotes);
-            Quote entry_legC = quoteMap.get(t.entry_legC_idquotes);
-            Quote entry_legD = quoteMap.get(t.entry_legD_idquotes);
+        for (int i = 0; i < portfolioTrades.size(); i++) {
 
-            // ****************************************************************
-            // buying
+            Trade t = trades.get(i);
 
-            // first calculate the cost of a single
-            // not sure how to do some sort of margin requirement here
-            float capital_required_single = 0; // 
+            if (cash < 0 || (lastExit != null && lastExit.before(TradeController.dateOfEarliestEntry(t, quoteMap)))) {
+                continue;
+            }
 
-            //if (entry_outright != null)
-                // 
-            
+            lastExit = TradeController.dateOfLatestExit(t, quoteMap);
 
-            Quote exit_outright = quoteMap.get(t.exit_outright_idquotes);
-            Quote exit_legA = quoteMap.get(t.exit_legA_idquotes);
-            Quote exit_legB = quoteMap.get(t.exit_legB_idquotes);
-            Quote exit_legC = quoteMap.get(t.exit_legC_idquotes);
-            Quote exit_legD = quoteMap.get(t.exit_legD_idquotes);
+            int m = (int) (cash / TradeController.marginReq(t, quoteMap, fullAllocation.margin_requirement_percent_options, fullAllocation.outright_margin_multiplier));
+            cash -= m * TradeController.tradeValueEntry(t, quoteMap);
+            portfolioTrades.add(new PortfolioTrade(t, m));
+            cash += m * TradeController.tradeValueExit(t, quoteMap);
+        }
 
-            return new PortfolioTrade();
-        }).collect(Collectors.toList());
+        return portfolioTrades;
     }
 
 }

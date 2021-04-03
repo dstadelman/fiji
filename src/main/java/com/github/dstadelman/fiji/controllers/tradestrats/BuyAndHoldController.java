@@ -9,7 +9,9 @@ import java.util.List;
 
 import com.github.dstadelman.fiji.controllers.DBQuoteController;
 import com.github.dstadelman.fiji.controllers.DBQuoteController.QuoteNotFoundException;
+import com.github.dstadelman.fiji.controllers.TradeController.IllegalTradeException;
 import com.github.dstadelman.fiji.controllers.ITradeStratController;
+import com.github.dstadelman.fiji.controllers.TradeController;
 import com.github.dstadelman.fiji.db.DBCPDataSource;
 import com.github.dstadelman.fiji.entities.Quote;
 import com.github.dstadelman.fiji.entities.QuoteMap;
@@ -20,12 +22,12 @@ public class BuyAndHoldController implements ITradeStratController {
 
     protected BuyAndHold tstrat;
 
-    public BuyAndHoldController(BuyAndHold tstrat) {
-        this.tstrat = tstrat;
+    public BuyAndHoldController(BuyAndHold buyAndHold) {
+        this.tstrat = buyAndHold;
     }
 
     @Override
-    public List<Trade> generate(QuoteMap quoteMap) throws SQLException, QuoteNotFoundException {
+    public List<Trade> generate(QuoteMap quoteMap) throws SQLException, QuoteNotFoundException, IllegalTradeException {
 
         Trade t = new Trade();
 
@@ -65,7 +67,9 @@ public class BuyAndHoldController implements ITradeStratController {
 
             t.exit_outright_idquotes = quote.idquotes;
             t.exit_outright_quantity = -1;
-        }      
+        }
+        
+        TradeController.validateTrade(t, quoteMap);
         
         List<Trade> trades = new ArrayList<Trade>();
         trades.add(t);
