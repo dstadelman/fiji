@@ -44,7 +44,7 @@ public class FullAllocationController implements IPortfolioStratController {
 
             lastExit = TradeController.dateOfLatestExit(t, quoteMap);
 
-            int m = (int) (cash / TradeController.marginReq(t, quoteMap, fullAllocation.margin_requirement_percent_options, fullAllocation.outright_margin_multiplier));
+            int m = (int) (cash / TradeController.marginReq(t, quoteMap, fullAllocation.margin_requirement_options, fullAllocation.outright_leverage));
             
             float entryOne = TradeController.tradeValueEntry(t, quoteMap);
             cash -= m * entryOne;
