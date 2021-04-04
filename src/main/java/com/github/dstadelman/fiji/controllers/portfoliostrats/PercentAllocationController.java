@@ -1,6 +1,7 @@
 package com.github.dstadelman.fiji.controllers.portfoliostrats;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,18 +31,18 @@ public class PercentAllocationController implements IPortfolioStratController {
 
         List<PortfolioTrade> portfolioTrades = new ArrayList<PortfolioTrade>();
 
-        Date lastExit = null;
+        LocalDate lastExit = null;
 
         for (int i = 0; i < trades.size(); i++) {
 
             Trade t = trades.get(i);
 
-            if (cash < 0 || (lastExit != null && lastExit.before(TradeController.dateOfEarliestEntry(t, quoteMap)))) {
+            if (cash < 0 || (lastExit != null && lastExit.isBefore(TradeController.dateOfEarliestEntry(t, quoteMap)))) {
                 continue;
             }
 
-            Date dateEntry = TradeController.dateOfEarliestEntry(t, quoteMap);
-            Date dateExit = TradeController.dateOfLatestExit(t, quoteMap);
+            LocalDate dateEntry = TradeController.dateOfEarliestEntry(t, quoteMap);
+            LocalDate dateExit = TradeController.dateOfLatestExit(t, quoteMap);
             lastExit = dateExit;
 
             int m = (int) ((cash * percentAllocation.percent_allocation) / TradeController.marginReq(t, quoteMap, percentAllocation.margin_requirement_options, percentAllocation.outright_leverage));

@@ -4,6 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 
 import com.github.dstadelman.fiji.db.DBCPDataSource;
 import com.github.dstadelman.fiji.entities.Quote;
@@ -138,9 +142,11 @@ public class DBQuoteController extends DBController {
 
         q.idquotes = rs.getInt(f(table, "idquotes"));
         q.underlying_symbol = rs.getString(f(table, "underlying_symbol"));
-        q.quote_date = rs.getDate(f(table, "quote_date"));
+        Date quote_date = rs.getDate(f(table, "quote_date"));
+        q.quote_date = Instant.ofEpochMilli(quote_date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
         q.root = rs.getString(f(table, "root"));
-        q.expiration = rs.getDate(f(table, "expiration"));
+        Date expiration = rs.getDate(f(table, "expiration"));
+        q.expiration = Instant.ofEpochMilli(expiration.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
         q.strike = rs.getFloat(f(table, "strike"));
         q.option_type = rs.getString(f(table, "option_type"));
         q.open = rs.getFloat(f(table, "open"));

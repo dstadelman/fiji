@@ -36,6 +36,16 @@ public class DBQuoteControllerTest {
             assertTrue("RUT".equals(quoteA.root));
             assertTrue("RUT".equals(quoteB.root));
 
+            assertTrue(quoteA.quote_date.equals(quoteA.quote_date));
+            assertTrue(quoteB.quote_date.equals(quoteB.quote_date));
+
+            if (quoteA.quote_date.isBefore(quoteB.quote_date))
+                assertTrue(quoteA.quote_date.isAfter(quoteB.quote_date));
+            else if (quoteB.quote_date.isBefore(quoteA.quote_date))
+                assertTrue(quoteB.quote_date.isAfter(quoteA.quote_date));
+            else
+                assertTrue(quoteA.quote_date.equals(quoteB.quote_date));
+
             //System.out.println(rs.getString("root"));
             foundOne = true;
         }

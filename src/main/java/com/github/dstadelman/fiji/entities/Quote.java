@@ -1,5 +1,6 @@
 package com.github.dstadelman.fiji.entities;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -18,9 +19,9 @@ public class Quote {
     public Integer idquotes;
 
     @Column public String underlying_symbol;
-    @Column public Date quote_date;
+    @Column public LocalDate quote_date;
     @Column public String root;
-    @Column public Date expiration;
+    @Column public LocalDate expiration;
     @Column public Float strike;
     @Column public String option_type;
     @Column public Float open;

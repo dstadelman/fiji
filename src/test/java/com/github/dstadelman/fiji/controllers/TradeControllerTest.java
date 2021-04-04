@@ -8,6 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +36,10 @@ import org.junit.Test;
 public class TradeControllerTest {
 
     public void addQuoteWithDate(Map<Integer, Quote> quoteMap, int idquotes) throws ParseException {
+
         Quote q = new Quote();
-        q.quote_date = new SimpleDateFormat("MM/dd/yyyy").parse(String.format("01/%02d/2020", idquotes));
+        Date quote_date = new SimpleDateFormat("MM/dd/yyyy").parse(String.format("01/%02d/2020", idquotes));
+        q.quote_date = Instant.ofEpochMilli(quote_date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
         quoteMap.put(idquotes, q);
     }
 
@@ -64,8 +69,8 @@ public class TradeControllerTest {
         b.entry_legC_idquotes = 5;
         b.entry_legD_idquotes = 6;
 
-        assertTrue(-1 == c.compare(a, b));
-        assertTrue(1 == c.compare(b, a));
+        assertTrue(0 > c.compare(a, b));
+        assertTrue(0 < c.compare(b, a));
 
         a.entry_outright_idquotes = 2;
         a.entry_legA_idquotes = 1;
@@ -79,8 +84,8 @@ public class TradeControllerTest {
         b.entry_legC_idquotes = 5;
         b.entry_legD_idquotes = 6;
         
-        assertTrue(-1 == c.compare(a, b));
-        assertTrue(1 == c.compare(b, a));
+        assertTrue(0 > c.compare(a, b));
+        assertTrue(0 < c.compare(b, a));
 
         a.entry_outright_idquotes = 3;
         a.entry_legA_idquotes = 2;
@@ -94,8 +99,8 @@ public class TradeControllerTest {
         b.entry_legC_idquotes = 5;
         b.entry_legD_idquotes = 6;
         
-        assertTrue(-1 == c.compare(a, b));
-        assertTrue(1 == c.compare(b, a));
+        assertTrue(0 > c.compare(a, b));
+        assertTrue(0 < c.compare(b, a));
         
         a.entry_outright_idquotes = 4;
         a.entry_legA_idquotes = 2;
@@ -109,8 +114,8 @@ public class TradeControllerTest {
         b.entry_legC_idquotes = null;
         b.entry_legD_idquotes = 6;        
         
-        assertTrue(-1 == c.compare(a, b));
-        assertTrue(1 == c.compare(b, a));
+        assertTrue(0 > c.compare(a, b));
+        assertTrue(0 < c.compare(b, a));
         
         a.entry_outright_idquotes = 5;
         a.entry_legA_idquotes = 2;
@@ -124,8 +129,8 @@ public class TradeControllerTest {
         b.entry_legC_idquotes = 5;
         b.entry_legD_idquotes = null;                
         
-        assertTrue(-1 == c.compare(a, b));
-        assertTrue(1 == c.compare(b, a));
+        assertTrue(0 > c.compare(a, b));
+        assertTrue(0 < c.compare(b, a));
         
         a.entry_outright_idquotes = 1;
         a.entry_legA_idquotes = 2;
@@ -133,8 +138,8 @@ public class TradeControllerTest {
         a.entry_legC_idquotes = 4;
         a.entry_legD_idquotes = 5;        
         
-        assertTrue(-1 == c.compare(a, b));        
-        assertTrue(1 == c.compare(b, a));
+        assertTrue(0 > c.compare(a, b));        
+        assertTrue(0 < c.compare(b, a));
 
         a.entry_outright_idquotes = 2;
         a.entry_legA_idquotes = 2;
@@ -157,8 +162,8 @@ public class TradeControllerTest {
         b.entry_legC_idquotes = 5;
         b.entry_legD_idquotes = 6;
 
-        assertTrue(-1 == c.compare(a, b));
-        assertTrue(1 == c.compare(b, a));
+        assertTrue(0 > c.compare(a, b));
+        assertTrue(0 < c.compare(b, a));
 
         a.entry_outright_idquotes = 2;
         a.entry_legA_idquotes = 1;
@@ -166,8 +171,8 @@ public class TradeControllerTest {
         a.entry_legC_idquotes = 4;
         a.entry_legD_idquotes = 5;        
         
-        assertTrue(-1 == c.compare(a, b));
-        assertTrue(1 == c.compare(b, a));
+        assertTrue(0 > c.compare(a, b));
+        assertTrue(0 < c.compare(b, a));
 
         a.entry_outright_idquotes = 3;
         a.entry_legA_idquotes = 2;
@@ -175,8 +180,8 @@ public class TradeControllerTest {
         a.entry_legC_idquotes = 4;
         a.entry_legD_idquotes = 5;        
         
-        assertTrue(-1 == c.compare(a, b));
-        assertTrue(1 == c.compare(b, a));
+        assertTrue(0 > c.compare(a, b));
+        assertTrue(0 < c.compare(b, a));
         
         a.entry_outright_idquotes = 4;
         a.entry_legA_idquotes = 2;
@@ -184,8 +189,8 @@ public class TradeControllerTest {
         a.entry_legC_idquotes = 1;
         a.entry_legD_idquotes = 5;        
         
-        assertTrue(-1 == c.compare(a, b));
-        assertTrue(1 == c.compare(b, a));
+        assertTrue(0 > c.compare(a, b));
+        assertTrue(0 < c.compare(b, a));
         
         a.entry_outright_idquotes = 5;
         a.entry_legA_idquotes = 2;
@@ -193,8 +198,8 @@ public class TradeControllerTest {
         a.entry_legC_idquotes = 4;
         a.entry_legD_idquotes = 1;        
         
-        assertTrue(-1 == c.compare(a, b));
-        assertTrue(1 == c.compare(b, a));
+        assertTrue(0 > c.compare(a, b));
+        assertTrue(0 < c.compare(b, a));
         
         a.entry_outright_idquotes = 1;
         a.entry_legA_idquotes = 2;
@@ -202,8 +207,8 @@ public class TradeControllerTest {
         a.entry_legC_idquotes = 4;
         a.entry_legD_idquotes = 5;        
         
-        assertTrue(-1 == c.compare(a, b));        
-        assertTrue(1 == c.compare(b, a));
+        assertTrue(0 > c.compare(a, b));        
+        assertTrue(0 < c.compare(b, a));
 
         a.entry_outright_idquotes = 2;
         a.entry_legA_idquotes = 2;

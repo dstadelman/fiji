@@ -36,35 +36,35 @@ public class TradeController {
             
             // return the trade with the earliest entry date, and then earliest exit date
 
-            Date a_d = null;
-            Date b_d = null;
+            LocalDate a_d = null;
+            LocalDate b_d = null;
 
             {
-                if (a.entry_outright_idquotes != null && (a_d == null || quoteMap.get(a.entry_outright_idquotes).quote_date.compareTo(a_d) < 0))
+                if (a.entry_outright_idquotes != null && (a_d == null || quoteMap.get(a.entry_outright_idquotes).quote_date.isBefore(a_d)))
                     a_d = quoteMap.get(a.entry_outright_idquotes).quote_date;
-                if (a.entry_legA_idquotes != null && (a_d == null || quoteMap.get(a.entry_legA_idquotes).quote_date.compareTo(a_d) < 0))
+                if (a.entry_legA_idquotes != null && (a_d == null || quoteMap.get(a.entry_legA_idquotes).quote_date.isBefore(a_d)))
                     a_d = quoteMap.get(a.entry_legA_idquotes).quote_date;
-                if (a.entry_legB_idquotes != null && (a_d == null || quoteMap.get(a.entry_legB_idquotes).quote_date.compareTo(a_d) < 0))
+                if (a.entry_legB_idquotes != null && (a_d == null || quoteMap.get(a.entry_legB_idquotes).quote_date.isBefore(a_d)))
                     a_d = quoteMap.get(a.entry_legB_idquotes).quote_date;
-                if (a.entry_legC_idquotes != null && (a_d == null || quoteMap.get(a.entry_legC_idquotes).quote_date.compareTo(a_d) < 0))
+                if (a.entry_legC_idquotes != null && (a_d == null || quoteMap.get(a.entry_legC_idquotes).quote_date.isBefore(a_d)))
                     a_d = quoteMap.get(a.entry_legC_idquotes).quote_date;                    
-                if (a.entry_legD_idquotes != null && (a_d == null || quoteMap.get(a.entry_legD_idquotes).quote_date.compareTo(a_d) < 0))
+                if (a.entry_legD_idquotes != null && (a_d == null || quoteMap.get(a.entry_legD_idquotes).quote_date.isBefore(a_d)))
                     a_d = quoteMap.get(a.entry_legD_idquotes).quote_date;                                        
             }
 
             {
-                if (b.entry_outright_idquotes != null && (b_d == null || quoteMap.get(b.entry_outright_idquotes).quote_date.compareTo(b_d) < 0))
+                if (b.entry_outright_idquotes != null && (b_d == null || quoteMap.get(b.entry_outright_idquotes).quote_date.isBefore(b_d)))
                     b_d = quoteMap.get(b.entry_outright_idquotes).quote_date;
-                if (b.entry_legA_idquotes != null && (b_d == null || quoteMap.get(b.entry_legA_idquotes).quote_date.compareTo(b_d) < 0))
+                if (b.entry_legA_idquotes != null && (b_d == null || quoteMap.get(b.entry_legA_idquotes).quote_date.isBefore(b_d)))
                     b_d = quoteMap.get(b.entry_legA_idquotes).quote_date;
-                if (b.entry_legB_idquotes != null && (b_d == null || quoteMap.get(b.entry_legB_idquotes).quote_date.compareTo(b_d) < 0))
+                if (b.entry_legB_idquotes != null && (b_d == null || quoteMap.get(b.entry_legB_idquotes).quote_date.isBefore(b_d)))
                     b_d = quoteMap.get(b.entry_legB_idquotes).quote_date;
-                if (b.entry_legC_idquotes != null && (b_d == null || quoteMap.get(b.entry_legC_idquotes).quote_date.compareTo(b_d) < 0))
+                if (b.entry_legC_idquotes != null && (b_d == null || quoteMap.get(b.entry_legC_idquotes).quote_date.isBefore(b_d)))
                     b_d = quoteMap.get(b.entry_legC_idquotes).quote_date;                    
-                if (b.entry_legD_idquotes != null && (b_d == null || quoteMap.get(b.entry_legD_idquotes).quote_date.compareTo(b_d) < 0))
+                if (b.entry_legD_idquotes != null && (b_d == null || quoteMap.get(b.entry_legD_idquotes).quote_date.isBefore(b_d)))
                     b_d = quoteMap.get(b.entry_legD_idquotes).quote_date;                                                        
-            }            
-
+            }      
+            
             return a_d.compareTo(b_d);
         }
     }
@@ -82,65 +82,65 @@ public class TradeController {
         }
     }
 
-    public static Date dateOfEarliestEntry(Trade t, QuoteMap quoteMap) throws QuoteNotFoundException, SQLException {
+    public static LocalDate dateOfEarliestEntry(Trade t, QuoteMap quoteMap) throws QuoteNotFoundException, SQLException {
 
-        Date earliest = null;
+        LocalDate earliest = null;
 
         if (t.entry_outright_idquotes != null) {
             Quote entry = DBQuoteController.getQuote(t.entry_outright_idquotes, quoteMap);
-            earliest = (earliest == null) ? entry.quote_date : (earliest.before(entry.quote_date)) ? earliest : entry.quote_date;
+            earliest = (earliest == null) ? entry.quote_date : (earliest.isBefore(entry.quote_date)) ? earliest : entry.quote_date;
         }
 
         if (t.entry_legA_idquotes != null) {
             Quote entry = DBQuoteController.getQuote(t.entry_legA_idquotes, quoteMap);
-            earliest = (earliest == null) ? entry.quote_date : (earliest.before(entry.quote_date)) ? earliest : entry.quote_date;
+            earliest = (earliest == null) ? entry.quote_date : (earliest.isBefore(entry.quote_date)) ? earliest : entry.quote_date;
         }
 
         if (t.entry_legB_idquotes != null) {
             Quote entry = DBQuoteController.getQuote(t.entry_legB_idquotes, quoteMap);
-            earliest = (earliest == null) ? entry.quote_date : (earliest.before(entry.quote_date)) ? earliest : entry.quote_date;
+            earliest = (earliest == null) ? entry.quote_date : (earliest.isBefore(entry.quote_date)) ? earliest : entry.quote_date;
         }
 
         if (t.entry_legC_idquotes != null) {
             Quote entry = DBQuoteController.getQuote(t.entry_legC_idquotes, quoteMap);
-            earliest = (earliest == null) ? entry.quote_date : (earliest.before(entry.quote_date)) ? earliest : entry.quote_date;
+            earliest = (earliest == null) ? entry.quote_date : (earliest.isBefore(entry.quote_date)) ? earliest : entry.quote_date;
         }
 
         if (t.entry_legD_idquotes != null) {
             Quote entry = DBQuoteController.getQuote(t.entry_legD_idquotes, quoteMap);
-            earliest = (earliest == null) ? entry.quote_date : (earliest.before(entry.quote_date)) ? earliest : entry.quote_date;
+            earliest = (earliest == null) ? entry.quote_date : (earliest.isBefore(entry.quote_date)) ? earliest : entry.quote_date;
         }
 
         return earliest;
     }
 
-    public static Date dateOfLatestExit(Trade t, QuoteMap quoteMap) throws QuoteNotFoundException, SQLException {
+    public static LocalDate dateOfLatestExit(Trade t, QuoteMap quoteMap) throws QuoteNotFoundException, SQLException {
 
-        Date latest = null;
+        LocalDate latest = null;
 
         if (t.exit_outright_idquotes != null) {
             Quote exit = DBQuoteController.getQuote(t.exit_outright_idquotes, quoteMap);
-            latest = (latest == null) ? exit.quote_date : (latest.after(exit.quote_date)) ? latest : exit.quote_date;
+            latest = (latest == null) ? exit.quote_date : (latest.isAfter(exit.quote_date)) ? latest : exit.quote_date;
         }
 
         if (t.exit_legA_idquotes != null) {
             Quote exit = DBQuoteController.getQuote(t.exit_legA_idquotes, quoteMap);
-            latest = (latest == null) ? exit.quote_date : (latest.after(exit.quote_date)) ? latest : exit.quote_date;
+            latest = (latest == null) ? exit.quote_date : (latest.isAfter(exit.quote_date)) ? latest : exit.quote_date;
         }
 
         if (t.exit_legB_idquotes != null) {
             Quote exit = DBQuoteController.getQuote(t.exit_legB_idquotes, quoteMap);
-            latest = (latest == null) ? exit.quote_date : (latest.after(exit.quote_date)) ? latest : exit.quote_date;
+            latest = (latest == null) ? exit.quote_date : (latest.isAfter(exit.quote_date)) ? latest : exit.quote_date;
         }
 
         if (t.exit_legC_idquotes != null) {
             Quote exit = DBQuoteController.getQuote(t.exit_legC_idquotes, quoteMap);
-            latest = (latest == null) ? exit.quote_date : (latest.after(exit.quote_date)) ? latest : exit.quote_date;
+            latest = (latest == null) ? exit.quote_date : (latest.isAfter(exit.quote_date)) ? latest : exit.quote_date;
         }
 
         if (t.exit_legD_idquotes != null) {
             Quote exit = DBQuoteController.getQuote(t.exit_legD_idquotes, quoteMap);
-            latest = (latest == null) ? exit.quote_date : (latest.after(exit.quote_date)) ? latest : exit.quote_date;
+            latest = (latest == null) ? exit.quote_date : (latest.isAfter(exit.quote_date)) ? latest : exit.quote_date;
         }
 
         return latest;
@@ -250,7 +250,7 @@ public class TradeController {
 
             assert(pt.trade.exit_outright_idquotes != null);
 
-            
+
         }
 
         return v;
@@ -292,7 +292,7 @@ public class TradeController {
             throw new IllegalTradeException(description + ": exit quote is not found (" + exit_idquotes + ")");
         }        
 
-        if (!entry.quote_date.before(exit.quote_date)) {
+        if (!entry.quote_date.isBefore(exit.quote_date)) {
             throw new IllegalTradeException(description + ": entry quote_date is not before exit quote_date (" + entry_idquotes + ", " + exit_idquotes + ")");
         }
 
@@ -350,7 +350,7 @@ public class TradeController {
                 throw new IllegalTradeException("outright: exit quote is not found (" + t.exit_outright_idquotes + ")");
             }
 
-            if (!entry.quote_date.before(exit.quote_date)) {
+            if (!entry.quote_date.isBefore(exit.quote_date)) {
                 throw new IllegalTradeException("outright: entry quote_date is not before exit quote_date (" + t.entry_outright_idquotes + ", " + t.exit_outright_idquotes + ")");
             }
     
