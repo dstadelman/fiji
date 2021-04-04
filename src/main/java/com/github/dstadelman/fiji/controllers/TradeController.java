@@ -135,27 +135,27 @@ public class TradeController {
         
         float value = 0;
         
-        Quote outright = DBQuoteController.getQuote(t.entry_outright_idquotes, quoteMap);
+        Quote outright = t.entry_outright_idquotes == null ? null : DBQuoteController.getQuote(t.entry_outright_idquotes, quoteMap);
         if (outright != null && t.entry_outright_quantity != null) {
             value += (1 / outright_margin_multiplier) * DBQuoteController.valueMid1545_outright(outright, t.entry_outright_quantity);
         }
 
-        Quote legA = DBQuoteController.getQuote(t.entry_legA_idquotes, quoteMap);
+        Quote legA = t.entry_legA_idquotes == null ? null : DBQuoteController.getQuote(t.entry_legA_idquotes, quoteMap);
         if (legA != null && t.entry_legA_quantity != null) {
             value += margin_requirement_percent_options * legA.strike;
         }
 
-        Quote legB = DBQuoteController.getQuote(t.entry_legB_idquotes, quoteMap);
+        Quote legB = t.entry_legB_idquotes == null ? null : DBQuoteController.getQuote(t.entry_legB_idquotes, quoteMap);
         if (legB != null && t.entry_legB_quantity != null) {
             value += margin_requirement_percent_options * legB.strike;
         }        
 
-        Quote legC = DBQuoteController.getQuote(t.entry_legC_idquotes, quoteMap);
+        Quote legC = t.entry_legC_idquotes == null ? null : DBQuoteController.getQuote(t.entry_legC_idquotes, quoteMap);
         if (legC != null && t.entry_legC_quantity != null) {
             value += margin_requirement_percent_options * legC.strike;
         }
 
-        Quote legD = DBQuoteController.getQuote(t.entry_legD_idquotes, quoteMap);
+        Quote legD = t.entry_legD_idquotes == null ? null : DBQuoteController.getQuote(t.entry_legD_idquotes, quoteMap);
         if (legD != null && t.entry_legD_quantity != null) {
             value += margin_requirement_percent_options * legD.strike;
         }        
@@ -167,27 +167,27 @@ public class TradeController {
 
         float value = 0;
         
-        Quote outright = DBQuoteController.getQuote(t.entry_outright_idquotes, quoteMap);
+        Quote outright = t.entry_outright_idquotes == null ? null : DBQuoteController.getQuote(t.entry_outright_idquotes, quoteMap);
         if (outright != null && t.entry_outright_quantity != null) {
             value += DBQuoteController.valueMid1545_outright(outright, t.entry_outright_quantity);
         }
 
-        Quote legA = DBQuoteController.getQuote(t.entry_legA_idquotes, quoteMap);
+        Quote legA = t.entry_legA_idquotes == null ? null : DBQuoteController.getQuote(t.entry_legA_idquotes, quoteMap);
         if (legA != null && t.entry_legA_quantity != null) {
             value += DBQuoteController.valueMid1545_leg(legA, t.entry_legA_quantity);
         }
 
-        Quote legB = DBQuoteController.getQuote(t.entry_legB_idquotes, quoteMap);
+        Quote legB = t.entry_legB_idquotes == null ? null : DBQuoteController.getQuote(t.entry_legB_idquotes, quoteMap);
         if (legB != null && t.entry_legB_quantity != null) {
             value += DBQuoteController.valueMid1545_leg(legB, t.entry_legB_quantity);
         }        
 
-        Quote legC = DBQuoteController.getQuote(t.entry_legC_idquotes, quoteMap);
+        Quote legC = t.entry_legC_idquotes == null ? null : DBQuoteController.getQuote(t.entry_legC_idquotes, quoteMap);
         if (legC != null && t.entry_legC_quantity != null) {
             value += DBQuoteController.valueMid1545_leg(legC, t.entry_legC_quantity);
         }
 
-        Quote legD = DBQuoteController.getQuote(t.entry_legD_idquotes, quoteMap);
+        Quote legD = t.entry_legD_idquotes == null ? null : DBQuoteController.getQuote(t.entry_legD_idquotes, quoteMap);
         if (legD != null && t.entry_legD_quantity != null) {
             value += DBQuoteController.valueMid1545_leg(legD, t.entry_legD_quantity);
         }        
@@ -199,27 +199,27 @@ public class TradeController {
 
         float value = 0;
         
-        Quote outright = DBQuoteController.getQuote(t.exit_outright_idquotes, quoteMap);
+        Quote outright = t.exit_outright_idquotes == null ? null : DBQuoteController.getQuote(t.exit_outright_idquotes, quoteMap);
         if (outright != null && t.exit_outright_quantity != null) {
             value += DBQuoteController.valueMid1545_outright(outright, t.exit_outright_quantity);
         }
 
-        Quote legA = DBQuoteController.getQuote(t.exit_legA_idquotes, quoteMap);
+        Quote legA = t.exit_legA_idquotes == null ? null : DBQuoteController.getQuote(t.exit_legA_idquotes, quoteMap);
         if (legA != null && t.exit_legA_quantity != null) {
             value += DBQuoteController.valueMid1545_leg(legA, t.exit_legA_quantity);
         }
 
-        Quote legB = DBQuoteController.getQuote(t.exit_legB_idquotes, quoteMap);
+        Quote legB = t.exit_legB_idquotes == null ? null : DBQuoteController.getQuote(t.exit_legB_idquotes, quoteMap);
         if (legB != null && t.exit_legB_quantity != null) {
             value += DBQuoteController.valueMid1545_leg(legB, t.exit_legB_quantity);
         }        
 
-        Quote legC = DBQuoteController.getQuote(t.exit_legC_idquotes, quoteMap);
+        Quote legC = t.exit_legC_idquotes == null ? null : DBQuoteController.getQuote(t.exit_legC_idquotes, quoteMap);
         if (legC != null && t.exit_legC_quantity != null) {
             value += DBQuoteController.valueMid1545_leg(legC, t.exit_legC_quantity);
         }
 
-        Quote legD = DBQuoteController.getQuote(t.exit_legD_idquotes, quoteMap);
+        Quote legD = t.exit_legD_idquotes == null ? null : DBQuoteController.getQuote(t.exit_legD_idquotes, quoteMap);
         if (legD != null && t.exit_legD_quantity != null) {
             value += DBQuoteController.valueMid1545_leg(legD, t.exit_legD_quantity);
         }        

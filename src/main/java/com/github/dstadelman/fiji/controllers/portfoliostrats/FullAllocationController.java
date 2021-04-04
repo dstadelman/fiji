@@ -34,7 +34,7 @@ public class FullAllocationController implements IPortfolioStratController {
 
         Date lastExit = null;
 
-        for (int i = 0; i < portfolioTrades.size(); i++) {
+        for (int i = 0; i < trades.size(); i++) {
 
             Trade t = trades.get(i);
 
@@ -45,9 +45,12 @@ public class FullAllocationController implements IPortfolioStratController {
             lastExit = TradeController.dateOfLatestExit(t, quoteMap);
 
             int m = (int) (cash / TradeController.marginReq(t, quoteMap, fullAllocation.margin_requirement_percent_options, fullAllocation.outright_margin_multiplier));
-            cash -= m * TradeController.tradeValueEntry(t, quoteMap);
+            
+            float entryOne = TradeController.tradeValueEntry(t, quoteMap);
+            cash -= m * entryOne;
             portfolioTrades.add(new PortfolioTrade(t, m));
-            cash += m * TradeController.tradeValueExit(t, quoteMap);
+            float exitOne = TradeController.tradeValueExit(t, quoteMap);
+            cash -= m * exitOne;
         }
 
         return portfolioTrades;
