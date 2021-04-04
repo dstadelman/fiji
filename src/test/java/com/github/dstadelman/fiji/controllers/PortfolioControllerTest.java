@@ -17,8 +17,13 @@ public class PortfolioControllerTest {
     @Test
     public void buyAndHold_fullAllocation_test() throws SQLException, QuoteNotFoundException, IllegalTradeException {
 
-        PortfolioController.execute(new BuyAndHoldController(new BuyAndHold("RUT")), 
-            new FullAllocationController(new FullAllocation()), 
+        BuyAndHold buyAndHold = new BuyAndHold("RUT");
+        System.out.println(buyAndHold.getDescription());
+        FullAllocation fullAllocation = new FullAllocation();
+        System.out.println(fullAllocation.getDescription());
+
+        PortfolioController.execute(new BuyAndHoldController(buyAndHold), 
+            new FullAllocationController(fullAllocation), 
             new QuoteMap());
         
     }

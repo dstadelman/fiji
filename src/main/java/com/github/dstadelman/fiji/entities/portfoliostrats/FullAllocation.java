@@ -1,6 +1,8 @@
 package com.github.dstadelman.fiji.entities.portfoliostrats;
 
-public class FullAllocation {
+import com.github.dstadelman.fiji.entities.IDescription;
+
+public class FullAllocation implements IDescription {
 
     public float initial_capital;
 
@@ -18,6 +20,11 @@ public class FullAllocation {
         this.initial_capital = 100000;
         this.margin_requirement_percent_options = .2f; 
         this.outright_margin_multiplier = 1;
+    }
+
+    @Override
+    public String getDescription() {
+        return String.format("Full Allocation initial: $%.02f, margin req.: %.0f%, leverage: %.02fx", initial_capital, margin_requirement_percent_options * 100, outright_margin_multiplier);
     }
 
 }
