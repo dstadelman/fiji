@@ -1,10 +1,12 @@
 package com.github.dstadelman.fiji.controllers;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Date;
 
 import com.github.dstadelman.fiji.controllers.DBQuoteController.QuoteNotFoundException;
+import com.github.dstadelman.fiji.entities.PortfolioTrade;
 import com.github.dstadelman.fiji.entities.Quote;
 import com.github.dstadelman.fiji.entities.QuoteMap;
 import com.github.dstadelman.fiji.entities.Trade;
@@ -64,6 +66,19 @@ public class TradeController {
             }            
 
             return a_d.compareTo(b_d);
+        }
+    }
+
+    public static class TradeValueOnDate {
+
+        public boolean noData;
+        public float cashDelta; // for trade entry and exit
+        public float netLiq;
+
+        public TradeValueOnDate() {
+            noData = true;
+            cashDelta = 0;
+            netLiq = 0;
         }
     }
 
@@ -225,6 +240,20 @@ public class TradeController {
         }        
 
         return value;
+    }    
+
+    public static TradeValueOnDate tradeValueOnDate(PortfolioTrade pt, LocalDate currDate, QuoteMap quoteMap) {
+
+        TradeValueOnDate v = new TradeValueOnDate();
+
+        if (pt.trade.entry_outright_idquotes != null) {
+
+            assert(pt.trade.exit_outright_idquotes != null);
+
+            
+        }
+
+        return v;
     }    
 
     public static void validateTrade_Leg(Integer entry_idquotes, Integer entry_quantity, Integer exit_idquotes, Integer exit_quantity, QuoteMap quoteMap, String description) throws IllegalTradeException, QuoteNotFoundException, SQLException {

@@ -58,6 +58,9 @@ http://hibernatepojoge.sourceforge.net
 https://www.baeldung.com/a-simple-guide-to-connection-pooling-in-java
 https://spring.io/projects/spring-cloud-dataflow
 
+LocalDate to Date conversions
+https://stackoverflow.com/questions/22929237/convert-java-time-localdate-into-java-util-date-type
+
 ### Cost Functions
 
 https://en.wikipedia.org/wiki/Sharpe_ratio
