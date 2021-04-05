@@ -23,7 +23,7 @@ public class QuickChartFrame extends JFrame {
             dataset.addSeries(series[0]);
         }
 
-        JFreeChart chart = ChartFactory.createTimeSeriesChart(title, "Date", "Value", dataset);
+        JFreeChart chart = ChartFactory.createTimeSeriesChart(title, "Date", "Net. Liq.", dataset);
     
         //Changes background color
         XYPlot plot = (XYPlot)chart.getPlot();
