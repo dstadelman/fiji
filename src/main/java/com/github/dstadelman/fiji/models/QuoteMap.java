@@ -1,4 +1,4 @@
-package com.github.dstadelman.fiji.entities;
+package com.github.dstadelman.fiji.models;
 
 import java.util.HashMap;
 

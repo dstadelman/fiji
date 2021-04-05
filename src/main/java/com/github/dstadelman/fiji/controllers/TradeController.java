@@ -6,10 +6,10 @@ import java.util.Comparator;
 import java.util.Date;
 
 import com.github.dstadelman.fiji.controllers.DBQuoteController.QuoteNotFoundException;
-import com.github.dstadelman.fiji.entities.PortfolioTrade;
-import com.github.dstadelman.fiji.entities.Quote;
-import com.github.dstadelman.fiji.entities.QuoteMap;
-import com.github.dstadelman.fiji.entities.Trade;
+import com.github.dstadelman.fiji.models.PortfolioTrade;
+import com.github.dstadelman.fiji.models.Quote;
+import com.github.dstadelman.fiji.models.QuoteMap;
+import com.github.dstadelman.fiji.models.Trade;
 
 public class TradeController {
 
@@ -71,14 +71,14 @@ public class TradeController {
 
     public static class TradeValueOnDate {
 
-        public boolean noData;
-        public float cashDelta; // for trade entry and exit
-        public float netLiq;
+        public boolean dataPresent;
+        public float cashDelta;     // for trade entry and exit
+        public float assetLiq; // for value of the trade right noe
 
         public TradeValueOnDate() {
-            noData = true;
+            dataPresent = false;
             cashDelta = 0;
-            netLiq = 0;
+            assetLiq = 0;
         }
     }
 
@@ -242,7 +242,62 @@ public class TradeController {
         return value;
     }    
 
-    public static TradeValueOnDate tradeValueOnDate(PortfolioTrade pt, LocalDate currDate, QuoteMap quoteMap) {
+    public static TradeValueOnDate tradeValueOnDate_leg(Integer entry_leg_idquotes, Integer entry_leg_quantity, Integer exit_leg_idquotes, Integer exit_leg_quantity, QuoteMap quoteMap, LocalDate currDate) throws QuoteNotFoundException, SQLException, IllegalTradeException {
+
+        TradeValueOnDate v = new TradeValueOnDate();
+
+        if (entry_leg_idquotes != null) {
+
+            assert(exit_leg_idquotes != null);
+
+            Quote entry = DBQuoteController.getQuote(entry_leg_idquotes, quoteMap);
+            Quote exit = DBQuoteController.getQuote(exit_leg_idquotes, quoteMap);
+
+            if (entry == null) {
+                throw new IllegalTradeException("invalid entry");
+            }
+
+            if (exit == null) {
+                throw new IllegalTradeException("invalid exit");
+            }
+
+            if (currDate.equals(entry.quote_date)) {
+                // opening the outright
+
+                float one = DBQuoteController.valueMid1545_leg(entry, entry_leg_quantity);
+
+                v.dataPresent = true;
+                v.cashDelta -= one;
+                v.assetLiq += one;
+            }
+            else if (currDate.equals(exit.quote_date)) {
+                // closing the outright
+
+                float one = DBQuoteController.valueMid1545_leg(exit, exit_leg_quantity);
+
+                v.dataPresent = true;
+                v.cashDelta -= one;
+                // v.assetLiq -= one;
+            }
+            else {
+                // attempt to find a quote for this date
+                Quote current = DBQuoteController.getQuoteForDate_leg(entry, currDate);
+
+                if (current != null) {
+
+                    float one = DBQuoteController.valueMid1545_leg(current, entry_leg_quantity);
+
+                    v.dataPresent = true;
+                    // v.cashDelta -= one;
+                    v.assetLiq += one;
+                }
+            }
+        }
+
+        return v;
+    }
+
+    public static TradeValueOnDate tradeValueOnDate(PortfolioTrade pt, LocalDate currDate, QuoteMap quoteMap) throws QuoteNotFoundException, SQLException, IllegalTradeException {
 
         TradeValueOnDate v = new TradeValueOnDate();
 
@@ -250,7 +305,82 @@ public class TradeController {
 
             assert(pt.trade.exit_outright_idquotes != null);
 
+            Quote entry = DBQuoteController.getQuote(pt.trade.entry_outright_idquotes, quoteMap);
+            Quote exit = DBQuoteController.getQuote(pt.trade.exit_outright_idquotes, quoteMap);
 
+            if (entry == null) {
+                throw new IllegalTradeException("invalid entry");
+            }
+
+            if (exit == null) {
+                throw new IllegalTradeException("invalid exit");
+            }
+            
+
+            if (currDate.equals(entry.quote_date)) {
+                // opening the outright
+
+                float one = DBQuoteController.valueMid1545_outright(entry, pt.trade.entry_outright_quantity);
+
+                v.dataPresent = true;
+                v.cashDelta -= one;
+                v.assetLiq += one;
+            }
+            else if (currDate.equals(exit.quote_date)) {
+                // closing the outright
+
+                float one = DBQuoteController.valueMid1545_outright(exit, pt.trade.exit_outright_quantity);
+
+                v.dataPresent = true;
+                v.cashDelta -= one;
+                // v.assetLiq -= one;
+            }
+            else {
+                // attempt to find a quote for this date
+                Quote current = DBQuoteController.getQuoteForDate_outright(entry, currDate);
+
+                if (current != null) {
+
+                    float one = DBQuoteController.valueMid1545_outright(current, pt.trade.entry_outright_quantity);
+
+                    v.dataPresent = true;
+                    // v.cashDelta -= one;
+                    v.assetLiq += one;
+                }
+            }
+        }
+
+        TradeValueOnDate vLegA = pt.trade.entry_legA_idquotes == null ? null : tradeValueOnDate_leg(pt.trade.entry_legA_idquotes, pt.trade.entry_legA_quantity, pt.trade.exit_legA_idquotes, pt.trade.exit_legA_quantity, quoteMap, currDate);
+        if (vLegA != null && vLegA.dataPresent) {
+            v.dataPresent = true;
+            v.cashDelta += vLegA.cashDelta;
+            v.assetLiq += vLegA.assetLiq;
+        }
+
+        TradeValueOnDate vLegB = pt.trade.entry_legB_idquotes == null ? null : tradeValueOnDate_leg(pt.trade.entry_legB_idquotes, pt.trade.entry_legB_quantity, pt.trade.exit_legB_idquotes, pt.trade.exit_legB_quantity, quoteMap, currDate);
+        if (vLegB != null && vLegB.dataPresent) {
+            v.dataPresent = true;
+            v.cashDelta += vLegB.cashDelta;
+            v.assetLiq += vLegB.assetLiq;
+        }        
+
+        TradeValueOnDate vLegC = pt.trade.entry_legC_idquotes == null ? null : tradeValueOnDate_leg(pt.trade.entry_legC_idquotes, pt.trade.entry_legC_quantity, pt.trade.exit_legC_idquotes, pt.trade.exit_legC_quantity, quoteMap, currDate);
+        if (vLegC != null && vLegC.dataPresent) {
+            v.dataPresent = true;
+            v.cashDelta += vLegC.cashDelta;
+            v.assetLiq += vLegC.assetLiq;
+        }
+        
+        TradeValueOnDate vLegD = pt.trade.entry_legD_idquotes == null ? null : tradeValueOnDate_leg(pt.trade.entry_legD_idquotes, pt.trade.entry_legD_quantity, pt.trade.exit_legD_idquotes, pt.trade.exit_legD_quantity, quoteMap, currDate);
+        if (vLegD != null && vLegD.dataPresent) {
+            v.dataPresent = true;
+            v.cashDelta += vLegD.cashDelta;
+            v.assetLiq += vLegD.assetLiq;
+        }
+
+        if (v.dataPresent) {
+            v.cashDelta *= pt.quantity;
+            v.assetLiq *= pt.quantity;
         }
 
         return v;

@@ -1,6 +1,6 @@
-package com.github.dstadelman.fiji.entities.portfoliostrats;
+package com.github.dstadelman.fiji.models.portfoliostrats;
 
-import com.github.dstadelman.fiji.entities.IDescription;
+import com.github.dstadelman.fiji.models.IDescription;
 
 public class PercentAllocation implements IDescription {
 

@@ -13,10 +13,10 @@ import com.github.dstadelman.fiji.controllers.TradeController.IllegalTradeExcept
 import com.github.dstadelman.fiji.controllers.ITradeStratController;
 import com.github.dstadelman.fiji.controllers.TradeController;
 import com.github.dstadelman.fiji.db.DBCPDataSource;
-import com.github.dstadelman.fiji.entities.Quote;
-import com.github.dstadelman.fiji.entities.QuoteMap;
-import com.github.dstadelman.fiji.entities.Trade;
-import com.github.dstadelman.fiji.entities.tradestrats.BuyAndHold;
+import com.github.dstadelman.fiji.models.Quote;
+import com.github.dstadelman.fiji.models.QuoteMap;
+import com.github.dstadelman.fiji.models.Trade;
+import com.github.dstadelman.fiji.models.tradestrats.BuyAndHold;
 
 public class BuyAndHoldController implements ITradeStratController {
 
@@ -40,10 +40,17 @@ public class BuyAndHoldController implements ITradeStratController {
             ps.setString(1, tstrat.root);
             ResultSet rs = ps.executeQuery();
 
-            if (!rs.next())
+            if (!rs.next()) {
+                rs.close();
+                ps.close();
+                
                 throw new QuoteNotFoundException("could not find entry outright");
+            }
 
             Quote quote = DBQuoteController.quoteLoad(null, rs);
+            rs.close();
+            ps.close();
+            
 
             quoteMap.put(quote.idquotes, quote);
 
@@ -58,10 +65,17 @@ public class BuyAndHoldController implements ITradeStratController {
             ps.setString(1, tstrat.root);
             ResultSet rs = ps.executeQuery();
 
-            if (!rs.next())
+            if (!rs.next()) {
+                rs.close();
+                ps.close();
+                
                 throw new QuoteNotFoundException("could not find exit outright");
+            }
 
             Quote quote = DBQuoteController.quoteLoad(null, rs);
+            rs.close();
+            ps.close();
+            
 
             quoteMap.put(quote.idquotes, quote);
 

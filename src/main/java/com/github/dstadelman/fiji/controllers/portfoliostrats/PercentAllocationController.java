@@ -9,10 +9,10 @@ import java.util.List;
 import com.github.dstadelman.fiji.controllers.DBQuoteController.QuoteNotFoundException;
 import com.github.dstadelman.fiji.controllers.IPortfolioStratController;
 import com.github.dstadelman.fiji.controllers.TradeController;
-import com.github.dstadelman.fiji.entities.PortfolioTrade;
-import com.github.dstadelman.fiji.entities.QuoteMap;
-import com.github.dstadelman.fiji.entities.Trade;
-import com.github.dstadelman.fiji.entities.portfoliostrats.PercentAllocation;
+import com.github.dstadelman.fiji.models.PortfolioTrade;
+import com.github.dstadelman.fiji.models.QuoteMap;
+import com.github.dstadelman.fiji.models.Trade;
+import com.github.dstadelman.fiji.models.portfoliostrats.PercentAllocation;
 
 public class PercentAllocationController implements IPortfolioStratController {
 

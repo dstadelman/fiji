@@ -1,4 +1,4 @@
-package com.github.dstadelman.fiji.entities;
+package com.github.dstadelman.fiji.models;
 
 public interface IDescription {
 

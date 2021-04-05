@@ -3,15 +3,22 @@ package com.github.dstadelman.fiji.controllers;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+
 import com.github.dstadelman.fiji.controllers.DBQuoteController.QuoteNotFoundException;
 import com.github.dstadelman.fiji.controllers.TradeController.IllegalTradeException;
 import com.github.dstadelman.fiji.controllers.portfoliostrats.PercentAllocationController;
 import com.github.dstadelman.fiji.controllers.tradestrats.BuyAndHoldController;
-import com.github.dstadelman.fiji.entities.PortfolioTrade;
-import com.github.dstadelman.fiji.entities.QuoteMap;
-import com.github.dstadelman.fiji.entities.portfoliostrats.PercentAllocation;
-import com.github.dstadelman.fiji.entities.tradestrats.BuyAndHold;
+import com.github.dstadelman.fiji.models.PortfolioTrade;
+import com.github.dstadelman.fiji.models.QuoteMap;
+import com.github.dstadelman.fiji.models.portfoliostrats.PercentAllocation;
+import com.github.dstadelman.fiji.models.tradestrats.BuyAndHold;
+import com.github.dstadelman.fiji.views.QuickChartFrame;
 
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.xy.XYDataset;
 import org.junit.Test;
 
 public class PortfolioControllerTest {
@@ -30,7 +37,15 @@ public class PortfolioControllerTest {
             new PercentAllocationController(percentAllocation), 
             quoteMap);
 
-        ReportingController.generate(portfolioTrades, percentAllocation.initial_capital, quoteMap, buyAndHold, percentAllocation);
+        TimeSeries buyAndHold_fullAllocation = ReportingController.generateTimeSeries(portfolioTrades, percentAllocation.initial_capital, quoteMap, buyAndHold, percentAllocation);
+
+        SwingUtilities.invokeLater(() -> {
+            QuickChartFrame example = new QuickChartFrame("Test", buyAndHold_fullAllocation);
+            example.setSize(800, 400);
+            example.setLocationRelativeTo(null);
+            example.setVisible(true);
+            example.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        });        
     }
     
 }

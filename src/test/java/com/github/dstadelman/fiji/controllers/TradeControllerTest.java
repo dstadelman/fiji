@@ -22,10 +22,10 @@ import javax.persistence.criteria.Root;
 import com.github.dstadelman.fiji.controllers.DBController;
 import com.github.dstadelman.fiji.controllers.TradeController.QuoteDateTradeComparator;
 import com.github.dstadelman.fiji.db.DBCPDataSource;
-import com.github.dstadelman.fiji.entities.Quote;
-import com.github.dstadelman.fiji.entities.QuoteMap;
-import com.github.dstadelman.fiji.entities.Trade;
-import com.github.dstadelman.fiji.entities.TradeStrat;
+import com.github.dstadelman.fiji.models.Quote;
+import com.github.dstadelman.fiji.models.QuoteMap;
+import com.github.dstadelman.fiji.models.Trade;
+import com.github.dstadelman.fiji.models.TradeStrat;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;

@@ -1,17 +1,18 @@
 package com.github.dstadelman.fiji.controllers;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
+
 
 import com.github.dstadelman.fiji.db.DBCPDataSource;
-import com.github.dstadelman.fiji.entities.Quote;
-import com.github.dstadelman.fiji.entities.QuoteMap;
+import com.github.dstadelman.fiji.models.Quote;
+import com.github.dstadelman.fiji.models.QuoteMap;
 
 public class DBQuoteController extends DBController {
 
@@ -42,8 +43,14 @@ public class DBQuoteController extends DBController {
         while (rs.next())
         {
             Quote quote = DBQuoteController.quoteLoad(null, rs);
+            rs.close();
+            ps.close();
+            
             return quote;
         }
+        rs.close();
+        ps.close();
+        
         throw new QuoteNotFoundException(idquotes);
     }
 
@@ -57,6 +64,64 @@ public class DBQuoteController extends DBController {
         quoteMap.put(idquotes, q);
         return quoteMap.get(idquotes);
     }    
+
+    public static Quote getQuoteForDate_leg(Quote entry, LocalDate currDate) throws SQLException {
+
+        Connection c = DBCPDataSource.getConnection();
+
+        String sql = "SELECT " + DBQuoteController.quoteColumns(null)
+            + " FROM quotes"
+            + " WHERE root = ? AND underlying_symbol = ? AND quote_date = ? AND strike = ? AND option_type = ? LIMIT 1";
+
+        PreparedStatement ps = c.prepareStatement(sql); 
+        ps.setString(1, entry.root);
+        ps.setString(2, entry.underlying_symbol);
+        ps.setDate(3, java.sql.Date.valueOf(currDate));
+        ps.setFloat(4, entry.strike);
+        ps.setString(5, entry.option_type);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next())
+        {
+            Quote quote = DBQuoteController.quoteLoad(null, rs);
+            rs.close();
+            ps.close();
+            
+            return quote;
+        }
+        rs.close();
+        ps.close();
+        
+        return null;
+    }    
+
+    public static Quote getQuoteForDate_outright(Quote entry, LocalDate currDate) throws SQLException {
+
+        Connection c = DBCPDataSource.getConnection();
+
+        String sql = "SELECT " + DBQuoteController.quoteColumns(null)
+            + " FROM quotes"
+            + " WHERE root = ? AND underlying_symbol = ? AND quote_date = ? LIMIT 1";
+
+        PreparedStatement ps = c.prepareStatement(sql); 
+        ps.setString(1, entry.root);
+        ps.setString(2, entry.underlying_symbol);
+        ps.setDate(3, java.sql.Date.valueOf(currDate));
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next())
+        {
+            Quote quote = DBQuoteController.quoteLoad(null, rs);
+            rs.close();
+            ps.close();
+            
+            return quote;
+        }
+        rs.close();
+        ps.close();
+        
+        return null;
+    }
     
     public static String quoteColumns(String table) {
 

@@ -1,4 +1,4 @@
-package com.github.dstadelman.fiji.entities;
+package com.github.dstadelman.fiji.models;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -21,17 +21,6 @@ public class PortfolioTrade {
         this.quantity = quantity;
         this.dateEntry = dateEntry;
         this.dateExit  = dateExit;
-
-        // ensuring sanity...
-        // Calendar cal = Calendar.getInstance();
-        // cal.setTime(dateEntry);
-        // assert(this.dateEntry.getMonthValue() == cal.get(Calendar.MONTH) + 1);
-        // assert(this.dateEntry.getDayOfMonth() == cal.get(Calendar.DATE));
-        // assert(this.dateEntry.getYear() == cal.get(Calendar.YEAR));
-        // cal.setTime(dateExit);
-        // assert(this.dateExit.getMonthValue() == cal.get(Calendar.MONTH) + 1);
-        // assert(this.dateExit.getDayOfMonth() == cal.get(Calendar.DATE));
-        // assert(this.dateExit.getYear() == cal.get(Calendar.YEAR));        
     }
 
 }

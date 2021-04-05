@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.github.dstadelman.fiji.db.DBCPDataSource;
-import com.github.dstadelman.fiji.entities.Quote;
+import com.github.dstadelman.fiji.models.Quote;
 
 import org.junit.Test;
 
@@ -49,6 +49,10 @@ public class DBQuoteControllerTest {
             //System.out.println(rs.getString("root"));
             foundOne = true;
         }
+
+        rs.close();
+        ps.close();
+        
         assertTrue( foundOne );
     }
 }

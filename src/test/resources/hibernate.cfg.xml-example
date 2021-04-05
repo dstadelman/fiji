@@ -32,9 +32,9 @@
         <property name="hibernate.use_sql_comments">true</property>
 
         <!-- Names the annotated entity class -->
-        <mapping class="com.github.dstadelman.fiji.entities.Quote" />
-        <mapping class="com.github.dstadelman.fiji.entities.Trade" />
-        <mapping class="com.github.dstadelman.fiji.entities.TradeStrat" />
+        <mapping class="com.github.dstadelman.fiji.models.Quote" />
+        <mapping class="com.github.dstadelman.fiji.models.Trade" />
+        <mapping class="com.github.dstadelman.fiji.models.TradeStrat" />
 
     </session-factory>
 </hibernate-configuration>

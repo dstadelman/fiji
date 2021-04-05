@@ -26,6 +26,10 @@ public class DBCPDataSourceTest {
             System.out.println(rs.getString("root"));
             foundOne = true;
         }
+
+        rs.close();
+        ps.close();
+        
         assertTrue( foundOne );
     }   
 }
