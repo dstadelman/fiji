@@ -16,3 +16,6 @@ target
 # no properties
 app.properties
 hibernate.cfg.xml
+
+# little helper script
+quick_up.sh
