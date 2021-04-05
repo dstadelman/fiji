@@ -3,7 +3,6 @@ package com.github.dstadelman.fiji;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
@@ -25,7 +24,7 @@ public class App
 {
     public static void main(String[] args) throws SQLException, QuoteNotFoundException, IllegalTradeException
     {
-        BuyAndHold buyAndHold = new BuyAndHold("RUT");
+        BuyAndHold buyAndHold = new BuyAndHold("^RUT");
         // System.out.println(buyAndHold.getDescription());
         PercentAllocation percentAllocation = new PercentAllocation();
         // System.out.println(percentAllocation.getDescription());
@@ -39,7 +38,7 @@ public class App
         TimeSeries buyAndHold_fullAllocation = ReportingController.generateTimeSeries(portfolioTrades, percentAllocation.initial_capital, quoteMap, buyAndHold, percentAllocation);
 
         SwingUtilities.invokeLater(() -> {
-            QuickChartFrame example = new QuickChartFrame("RUT Backtest", buyAndHold_fullAllocation);
+            QuickChartFrame example = new QuickChartFrame("^RUT Backtest", buyAndHold_fullAllocation);
             example.setSize(800, 400);
             example.setLocationRelativeTo(null);
             example.setVisible(true);

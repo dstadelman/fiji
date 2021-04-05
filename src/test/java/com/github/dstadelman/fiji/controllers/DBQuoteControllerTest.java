@@ -33,10 +33,10 @@ public class DBQuoteControllerTest {
             {
                 Quote quoteA = DBQuoteController.quoteLoad("quotesA", rs);
                 Quote quoteB = DBQuoteController.quoteLoad("quotesB", rs);
-                System.out.println(quoteA.root);
-                System.out.println(quoteB.root);
-                assertTrue("RUT".equals(quoteA.root));
-                assertTrue("RUT".equals(quoteB.root));
+                System.out.println(quoteA.underlying_symbol);
+                System.out.println(quoteB.underlying_symbol);
+                assertTrue("^RUT".equals(quoteA.underlying_symbol));
+                assertTrue("^RUT".equals(quoteB.underlying_symbol));
 
                 assertTrue(quoteA.quote_date.equals(quoteA.quote_date));
                 assertTrue(quoteB.quote_date.equals(quoteB.quote_date));
@@ -48,7 +48,7 @@ public class DBQuoteControllerTest {
                 else
                     assertTrue(quoteA.quote_date.equals(quoteB.quote_date));
 
-                //System.out.println(rs.getString("root"));
+                //System.out.println(rs.getString("underlying_symbol"));
                 foundOne = true;
             }
 

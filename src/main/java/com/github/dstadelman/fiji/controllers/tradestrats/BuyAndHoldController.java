@@ -33,10 +33,10 @@ public class BuyAndHoldController implements ITradeStratController {
 
         {
             Connection c = DBCPDataSource.getConnection();
-            String sql = "SELECT " + DBQuoteController.quoteColumns(null) + " FROM quotes WHERE `root` = ? ORDER BY `quote_date` ASC LIMIT 1;";
+            String sql = "SELECT " + DBQuoteController.quoteColumns(null) + " FROM quotes WHERE `underlying_symbol` = ? ORDER BY `quote_date` ASC LIMIT 1;";
 
             PreparedStatement ps = c.prepareStatement(sql); 
-            ps.setString(1, tstrat.root);
+            ps.setString(1, tstrat.underlying_symbol);
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next()) {
@@ -57,10 +57,10 @@ public class BuyAndHoldController implements ITradeStratController {
 
         {
             Connection c = DBCPDataSource.getConnection();
-            String sql = "SELECT " + DBQuoteController.quoteColumns(null) + " FROM quotes WHERE `root` = ? ORDER BY `quote_date` DESC LIMIT 1;";
+            String sql = "SELECT " + DBQuoteController.quoteColumns(null) + " FROM quotes WHERE `underlying_symbol` = ? ORDER BY `quote_date` DESC LIMIT 1;";
 
             PreparedStatement ps = c.prepareStatement(sql); 
-            ps.setString(1, tstrat.root);
+            ps.setString(1, tstrat.underlying_symbol);
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next()) {

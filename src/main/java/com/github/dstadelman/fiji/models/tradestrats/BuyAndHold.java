@@ -4,15 +4,15 @@ import com.github.dstadelman.fiji.models.IDescription;
 
 public class BuyAndHold implements IDescription {
 
-    public String root;
+    public String underlying_symbol;
 
-    public BuyAndHold(String root) {
-        this.root = root;
+    public BuyAndHold(String underlying_symbol) {
+        this.underlying_symbol = underlying_symbol;
     }
 
     @Override
     public String getDescription() {
-        return root + ": Buy and Hold";
+        return underlying_symbol + ": Buy and Hold";
     }
 
 }

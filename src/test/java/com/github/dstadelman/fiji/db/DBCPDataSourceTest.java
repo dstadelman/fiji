@@ -23,7 +23,7 @@ public class DBCPDataSourceTest {
         boolean foundOne = false;
         while (rs.next())
         {
-            System.out.println(rs.getString("root"));
+            System.out.println(rs.getString("underlying_symbol"));
             foundOne = true;
         }
 
