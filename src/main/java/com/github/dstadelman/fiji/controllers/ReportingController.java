@@ -52,7 +52,7 @@ public class ReportingController {
         assert(seriesStart.equals(dates.get(0)));
         assert(seriesEnd.equals(dates.get(dates.size() - 1)));
 
-        TimeSeries s = new TimeSeries(tstrat.getDescription() + " / " + pstrat);
+        TimeSeries s = new TimeSeries(tstrat.getDescription() + " / " + pstrat.getDescription());
 
         float cash = initial_capital;
 

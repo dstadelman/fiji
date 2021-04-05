@@ -31,9 +31,8 @@ public class BuyAndHoldController implements ITradeStratController {
 
         Trade t = new Trade();
 
-        Connection c = DBCPDataSource.getConnection();
-
         {
+            Connection c = DBCPDataSource.getConnection();
             String sql = "SELECT " + DBQuoteController.quoteColumns(null) + " FROM quotes WHERE `root` = ? ORDER BY `quote_date` ASC LIMIT 1;";
 
             PreparedStatement ps = c.prepareStatement(sql); 
@@ -57,6 +56,7 @@ public class BuyAndHoldController implements ITradeStratController {
         }
 
         {
+            Connection c = DBCPDataSource.getConnection();
             String sql = "SELECT " + DBQuoteController.quoteColumns(null) + " FROM quotes WHERE `root` = ? ORDER BY `quote_date` DESC LIMIT 1;";
 
             PreparedStatement ps = c.prepareStatement(sql); 
@@ -71,7 +71,7 @@ public class BuyAndHoldController implements ITradeStratController {
 
             Quote quote = DBQuoteController.quoteLoad(null, rs);
             rs.close(); ps.close(); c.close();
-            
+
             quoteMap.put(quote.idquotes, quote);
 
             t.exit_outright_idquotes = quote.idquotes;

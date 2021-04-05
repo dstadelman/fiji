@@ -18,7 +18,6 @@ import com.github.dstadelman.fiji.models.tradestrats.BuyAndHold;
 import com.github.dstadelman.fiji.views.QuickChartFrame;
 
 import org.jfree.data.time.TimeSeries;
-import org.jfree.data.xy.XYDataset;
 import org.junit.Test;
 
 public class PortfolioControllerTest {
@@ -45,7 +44,7 @@ public class PortfolioControllerTest {
             example.setLocationRelativeTo(null);
             example.setVisible(true);
             example.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        });        
+        });
     }
     
 }

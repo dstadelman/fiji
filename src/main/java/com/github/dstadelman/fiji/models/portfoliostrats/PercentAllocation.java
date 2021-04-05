@@ -28,7 +28,7 @@ public class PercentAllocation implements IDescription {
 
     @Override
     public String getDescription() {
-        return String.format("%.0f% Allocation initial: $%.02f, margin req.: %.0f%, leverage: %.02fx", percent_allocation, initial_capital, margin_requirement_options * 100, outright_leverage);
+        return String.format("%.0f%% Allocation initial: $%.02f, margin req.: %.0f%%, leverage: %.02fx", percent_allocation * 100, initial_capital, margin_requirement_options * 100, outright_leverage);
     }
 
 }
