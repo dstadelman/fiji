@@ -27,8 +27,7 @@ public class DBCPDataSourceTest {
             foundOne = true;
         }
 
-        rs.close();
-        ps.close();
+        rs.close(); ps.close(); c.close();
         
         assertTrue( foundOne );
     }   

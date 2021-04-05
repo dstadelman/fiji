@@ -41,17 +41,15 @@ public class BuyAndHoldController implements ITradeStratController {
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next()) {
-                rs.close();
-                ps.close();
+
+                rs.close(); ps.close(); c.close();
                 
                 throw new QuoteNotFoundException("could not find entry outright");
             }
 
             Quote quote = DBQuoteController.quoteLoad(null, rs);
-            rs.close();
-            ps.close();
-            
-
+            rs.close(); ps.close(); c.close();
+                        
             quoteMap.put(quote.idquotes, quote);
 
             t.entry_outright_idquotes = quote.idquotes;
@@ -66,17 +64,14 @@ public class BuyAndHoldController implements ITradeStratController {
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next()) {
-                rs.close();
-                ps.close();
-                
+                rs.close(); ps.close(); c.close();
+                                
                 throw new QuoteNotFoundException("could not find exit outright");
             }
 
             Quote quote = DBQuoteController.quoteLoad(null, rs);
-            rs.close();
-            ps.close();
+            rs.close(); ps.close(); c.close();
             
-
             quoteMap.put(quote.idquotes, quote);
 
             t.exit_outright_idquotes = quote.idquotes;

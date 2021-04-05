@@ -5,11 +5,20 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.dbcp2.ConnectionFactory;
+import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
+import org.apache.commons.dbcp2.PoolableConnection;
+import org.apache.commons.dbcp2.PoolableConnectionFactory;
+import org.apache.commons.dbcp2.PoolingDataSource;
+import org.apache.commons.pool2.ObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+
+// import org.apache.commons.dbcp2.BasicDataSource;
 
 public class DBCPDataSource {
 
-    private static BasicDataSource ds = new BasicDataSource();
+    // private static BasicDataSource ds = new BasicDataSource();
+    private static PoolingDataSource<PoolableConnection> ds;
     
     static {
 
@@ -32,12 +41,18 @@ public class DBCPDataSource {
             if (mysqlPass == null || mysqlPass.isEmpty())
                 throw new Exception("app.properties missing mysql-pass");
 
-            ds.setUrl(mysqlURL);
-            ds.setUsername(mysqlUser);
-            ds.setPassword(mysqlPass);
-            ds.setMinIdle(5);
-            ds.setMaxIdle(10);
-            ds.setMaxOpenPreparedStatements(100);
+            // ds.setUrl(mysqlURL);
+            // ds.setUsername(mysqlUser);
+            // ds.setPassword(mysqlPass);
+            // ds.setMinIdle(5);
+            // ds.setMaxIdle(10);
+            // ds.setMaxOpenPreparedStatements(100);
+
+            ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(mysqlURL, mysqlUser, mysqlPass);
+            PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory, null);
+            ObjectPool<PoolableConnection> connectionPool = new GenericObjectPool<>(poolableConnectionFactory);
+            poolableConnectionFactory.setPool(connectionPool);
+            ds = new PoolingDataSource<>(connectionPool);
 
         } catch (Exception e) {
             System.err.println("ERROR: " + e.getMessage());

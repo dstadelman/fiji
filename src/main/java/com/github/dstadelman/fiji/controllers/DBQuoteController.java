@@ -43,13 +43,11 @@ public class DBQuoteController extends DBController {
         while (rs.next())
         {
             Quote quote = DBQuoteController.quoteLoad(null, rs);
-            rs.close();
-            ps.close();
+            rs.close(); ps.close(); c.close();
             
             return quote;
         }
-        rs.close();
-        ps.close();
+        rs.close(); ps.close(); c.close();
         
         throw new QuoteNotFoundException(idquotes);
     }
@@ -84,13 +82,11 @@ public class DBQuoteController extends DBController {
         while (rs.next())
         {
             Quote quote = DBQuoteController.quoteLoad(null, rs);
-            rs.close();
-            ps.close();
+            rs.close(); ps.close(); c.close();
             
             return quote;
         }
-        rs.close();
-        ps.close();
+        rs.close(); ps.close(); c.close();
         
         return null;
     }    
@@ -112,13 +108,11 @@ public class DBQuoteController extends DBController {
         while (rs.next())
         {
             Quote quote = DBQuoteController.quoteLoad(null, rs);
-            rs.close();
-            ps.close();
-            
+            rs.close(); ps.close(); c.close();
+
             return quote;
         }
-        rs.close();
-        ps.close();
+        rs.close(); ps.close(); c.close();
         
         return null;
     }
