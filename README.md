@@ -35,28 +35,38 @@ https://python-backtest.blogspot.com/2019/10/cboe-data-review.html?m=1
 ### MySQL
 
 https://dev.mysql.com/doc/mysql-windows-excerpt/5.7/en/windows-installation.html
-https://dev.mysql.com/doc/refman/8.0/en/window-functions-usage.html
-https://levelup.gitconnected.com/how-and-when-to-write-mysql-subqueries-8d5d580b1729
 
-JOIN table to itself 
-SELECT * FROM a AS a1, a AS a2 WHERE a1.price - a2.price = x
+https://dev.mysql.com/doc/refman/8.0/en/window-functions-usage.html
+
+https://levelup.gitconnected.com/how-and-when-to-write-mysql-subqueries-8d5d580b1729
 
 ### Java Reference
 
 https://www.baeldung.com/java-connect-mysql
+
 https://www.baeldung.com/thread-pool-java-and-guava
+
 https://www.baeldung.com/java-properties
+
 https://www.baeldung.com/jackson-object-mapper-tutorial
+
 https://www.baeldung.com/hibernate-criteria-queries
 
+
 https://stackoverflow.com/questions/5272966/jfreechart-image
+
 https://www.tutorialspoint.com/jfreechart/jfreechart_line_chart.htm
+
 https://www.boraji.com/jfreechart-time-series-chart-example
+
 
 http://hibernatepojoge.sourceforge.net
 
+
 https://www.baeldung.com/a-simple-guide-to-connection-pooling-in-java
+
 https://spring.io/projects/spring-cloud-dataflow
+
 
 LocalDate to Date conversions
 https://stackoverflow.com/questions/22929237/convert-java-time-localdate-into-java-util-date-type
@@ -80,4 +90,3 @@ Some operations are slow and MySQL Workbench gives up: https://stackoverflow.com
 * Also unchecked limit rows as putting a limit in every time I want to search the whole data set gets tiresome.
 
 All values to 0 in this dialog as MySQL database is local and I don't mind waiting.
-
