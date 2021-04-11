@@ -24,6 +24,7 @@ SELECT idquotes, quote_date, root, expiration, strike, active_underlying_price_1
 -- '7057106', '2017-10-26', 'RUTW', '2017-12-08', '1530', '1497.82', 'C', '12.5', '13.3', '0.3183', '-0.2785', '43', '89', '1'
 -- '7057093', '2017-10-26', 'RUTW', '2017-12-08', '1460', '1497.82', 'P', '14.7', '15.5', '-0.3', '-0.2983', '43', '1', '92'
 
+-- STRANGLE exit query
 SELECT quotesA.idquotes AS idquotesA
 	, quotesB.idquotes AS idquotesB
 	, quotesA.quote_date

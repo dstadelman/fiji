@@ -34,10 +34,10 @@ SELECT idquotes, quote_date, root, expiration, strike, active_underlying_price_1
 		AND DATEDIFF(expiration, quote_date) > 35
         AND DATEDIFF(expiration, quote_date) < 55
         AND delta_1545 <> 0
-		-- AND expiration >= "2020-01-03" AND expiration <= "2020-12-31" -- LIMIT RESULTS
+		AND expiration >= "2020-01-03" AND expiration <= "2020-12-31" -- LIMIT RESULTS
 ) sub
 WHERE expiration_rank_delta_low = 1 OR expiration_rank_delta_high = 1
-ORDER BY quote_date;
+ORDER BY quote_date, option_type;
 
 ## IRON_CONDOR
 -- not complete

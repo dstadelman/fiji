@@ -4,7 +4,7 @@ import com.github.dstadelman.fiji.models.IDescription;
 
 public class Strangle implements IDescription {
 
-    public String root;
+    public String underlying_symbol;
 
     public Float deltaPut;
     public Float deltaCall;
@@ -14,8 +14,8 @@ public class Strangle implements IDescription {
     public Integer exitDTE;
     public Float exitCostMultiplier;  
 
-    public Strangle(String root, Float deltaPut, Float deltaCall, Integer entryDTE, Integer exitDTE, Float exitCostMultiplier) {
-        this.root = root;
+    public Strangle(String underlying_symbol, Float deltaPut, Float deltaCall, Integer entryDTE, Integer exitDTE, Float exitCostMultiplier) {
+        this.underlying_symbol = underlying_symbol;
 
         this.deltaPut = deltaPut;
         this.deltaCall = deltaCall;
@@ -28,7 +28,7 @@ public class Strangle implements IDescription {
 
     @Override
     public String getDescription() {
-        return root + ": Strangle (CΔ:%.02f, PΔ:%.02f, %d-%d DTE, %.02fx Exit)";
+        return underlying_symbol + ": Strangle (CΔ:%.02f, PΔ:%.02f, %d-%d DTE, %.02fx Exit)";
     }
 
 }
