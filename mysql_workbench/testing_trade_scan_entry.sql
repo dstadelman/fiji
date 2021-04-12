@@ -22,15 +22,17 @@ SELECT * FROM (
 SELECT idquotes, quote_date, root, expiration, strike, active_underlying_price_1545, option_type, bid_1545, ask_1545, delta_1545, theta_1545
 	, DATEDIFF(expiration, quote_date) AS DTE
 	, RANK() OVER (PARTITION BY expiration ORDER BY 
-		ABS(DATEDIFF(expiration, quote_date) - 45)
+		root
+		, ABS(DATEDIFF(expiration, quote_date) - 45)
 		, ABS(delta_1545 - -.3)
 	) AS expiration_rank_delta_low
 	, RANK() OVER (PARTITION BY expiration ORDER BY 
-		ABS(DATEDIFF(expiration, quote_date) - 45)
+		root
+        , ABS(DATEDIFF(expiration, quote_date) - 45)
 		, ABS(delta_1545 - .3)
 	) AS expiration_rank_delta_high
 	FROM quotes
-	WHERE AND `expiration` > DATE_ADD("2004-01-08", INTERVAL 45 DAY) 
+	WHERE `expiration` > DATE_ADD("2004-01-08", INTERVAL 45 DAY) 
 		AND expiration < "2021-01-15"
 		AND DATEDIFF(expiration, quote_date) > 35
         AND DATEDIFF(expiration, quote_date) < 55

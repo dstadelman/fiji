@@ -29,9 +29,6 @@ public class PortfolioControllerTest {
 
         Strangle strangle = new Strangle("^RUT");
 
-        float open = 200;
-        float close = 100;
-
         // System.out.println(buyAndHold.getDescription());
         PercentAllocation percentAllocation = new PercentAllocation();
         // System.out.println(percentAllocation.getDescription());
@@ -42,17 +39,16 @@ public class PortfolioControllerTest {
             new PercentAllocationController(percentAllocation), 
             quoteMap);
 
-        // TimeSeries strangle_fullAllocation = ReportingController.generateTimeSeries(portfolioTrades, percentAllocation.initial_capital, quoteMap, strangle, percentAllocation);
+        TimeSeries strangle_fullAllocation = ReportingController.generateTimeSeries(portfolioTrades, percentAllocation.initial_capital, quoteMap, strangle, percentAllocation);
 
-        // SwingUtilities.invokeLater(() -> {
-        //     QuickChartFrame example = new QuickChartFrame("^RUT Backtest", strangle_fullAllocation);
-        //     example.setSize(800, 400);
-        //     example.setLocationRelativeTo(null);
-        //     example.setVisible(true);
-        //     example.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        // });
+        SwingUtilities.invokeLater(() -> {
+            QuickChartFrame example = new QuickChartFrame("^RUT Backtest", strangle_fullAllocation);
+            example.setSize(800, 400);
+            example.setLocationRelativeTo(null);
+            example.setVisible(true);
+            example.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        });
     }
-
 
     @Test
     public void buyAndHold_fullAllocation_test() throws SQLException, QuoteNotFoundException, IllegalTradeException {

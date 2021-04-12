@@ -434,7 +434,7 @@ public class TradeController {
             throw new IllegalTradeException(description + ": underlying_symbol does not match (" + entry_idquotes + ", " + exit_idquotes + ")");
         }
 
-        if (entry.strike != exit.strike) {
+        if (!entry.strike.equals(exit.strike)) {
             throw new IllegalTradeException(description + ": strike does not match (" + entry_idquotes + ", " + exit_idquotes + ")");
         }
 

@@ -93,11 +93,12 @@ public class StrangleController implements ITradeStratController {
             +       ", RANK() OVER (PARTITION BY `expiration` ORDER BY ABS(DATEDIFF(`expiration`, `quote_date`) - ?), ABS(`delta_1545` - ?)) AS `expiration_rank_delta_high`"
             +       " FROM quotes"
             +       " WHERE `underlying_symbol` = ?"
+            +           " AND (`root` = 'RUT' OR `root` = 'RUTW')"
             +           " AND DATEDIFF(`expiration`, ?) > ? AND `expiration` < ?"
             +           " AND DATEDIFF(`expiration`, `quote_date`) > ?"
             +           " AND DATEDIFF(`expiration`, `quote_date`) < ?"
             +           " AND `delta_1545` <> 0"
-            +           " AND `expiration` >= '2020-01-03' AND `expiration` <= '2020-12-31'" // LIMIT RESULTS
+            // +           " AND `expiration` >= '2020-01-03' AND `expiration` <= '2020-12-31'" // LIMIT RESULTS
             +   ") sub"
             + " WHERE `expiration_rank_delta_low` = 1 OR `expiration_rank_delta_high` = 1"
             + " ORDER BY `quote_date`, `option_type`;";
@@ -185,9 +186,9 @@ public class StrangleController implements ITradeStratController {
                     sqlSub +=   !sqlSub.isEmpty() ? " OR " : "";
                     sqlSub +=   tstrat.exitDTE != null           ? "DATEDIFF(`quotesCall`.`expiration`, `quotesCall`.`quote_date`) < ?" : "";
                     sqlSub +=   !sqlSub.isEmpty() ? " OR " : "";
-                    sqlSub +=   tstrat.exitPercentLoss != null   ? "(? * (`quotesCall`.`bid_1545` + `quotesCall`.`ask_1545`) / 2) + (? * (`quotesPut`.`bid_1545` + `quotesPut`.`ask_1545`) / 2) < ?" : "";
+                    sqlSub +=   tstrat.exitPercentLoss != null   ? "(? * ((`quotesCall`.`bid_1545` + `quotesCall`.`ask_1545`) / 2)) + (? * ((`quotesPut`.`bid_1545` + `quotesPut`.`ask_1545`) / 2)) < ?" : "";
                     sqlSub +=   !sqlSub.isEmpty() ? " OR " : "";
-                    sqlSub +=   tstrat.exitPercentProfit != null ? "(? * (`quotesCall`.`bid_1545` + `quotesCall`.`ask_1545`) / 2) + (? * (`quotesPut`.`bid_1545` + `quotesPut`.`ask_1545`) / 2) > ?" : "";
+                    sqlSub +=   tstrat.exitPercentProfit != null ? "(? * ((`quotesCall`.`bid_1545` + `quotesCall`.`ask_1545`) / 2)) + (? * ((`quotesPut`.`bid_1545` + `quotesPut`.`ask_1545`) / 2)) > ?" : "";
 
                     sql += "AND (" + sqlSub + ") ORDER BY quotesCall.quote_date LIMIT 1";
                 }
@@ -245,7 +246,10 @@ public class StrangleController implements ITradeStratController {
                 Quote exitQuotesCall = DBQuoteController.quoteLoad("quotesCall", rs);
                 Quote exitQuotesPut = DBQuoteController.quoteLoad("quotesPut", rs);
 
-                rs.close(); ps.close(); c.close();
+                quoteMap.put(exitQuotesCall.idquotes, exitQuotesCall);
+                quoteMap.put(exitQuotesPut.idquotes, exitQuotesPut);
+
+                rs.close(); ps.close(); // c.close();
 
                 Trade t = new Trade();
 
@@ -261,7 +265,7 @@ public class StrangleController implements ITradeStratController {
 
                 // Quantity Expiration Strike Option_Type Delta Cost
 
-                System.out.println("*******************************************************************************");
+                System.out.println("********************************************************************************************");
 
                 float open  = 0;
                 float close = 0;
@@ -322,6 +326,16 @@ public class StrangleController implements ITradeStratController {
                 open, close, 
                 close - open, 
                 (close - open) * 100 / Math.abs(open)));
+
+                String reason = "unknown";
+                if (tstrat.exitDTE != null && (exitQuotesPut.dte < tstrat.exitDTE || exitQuotesPut.dte < tstrat.exitDTE))
+                    reason = "< " + tstrat.exitDTE + "DTE";
+                else if (tstrat.exitPercentLoss != null && (close < tstrat.exitPercentLoss * open))
+                    reason = String.format("stop loss %12.02f%% hit", tstrat.exitPercentLoss * 100.f);
+                else if (tstrat.exitPercentProfit != null && (close > tstrat.exitPercentProfit * open))
+                    reason = String.format("take profit %12.02f%% hit", tstrat.exitPercentProfit * 100.f);
+
+                System.out.println(String.format("Reason Closed: %s", reason));
 
                 TradeController.validateTrade(t, quoteMap);
                 trades.add(t);
