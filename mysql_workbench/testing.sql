@@ -8,8 +8,9 @@
 -- CREATE INDEX `idx_quotes_expiration`  ON `fiji`.`quotes` (expiration) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
 -- CREATE INDEX `idx_quotes_option_type`  ON `fiji`.`quotes` (option_type) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
 -- CREATE INDEX `idx_quotes_strike`  ON `fiji`.`quotes` (strike) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
--- CREATE INDEX `idx_quotes_delta_1545`  ON `fiji`.`quotes` (delta_1545) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
-
+CREATE INDEX `idx_quotes_delta_1545`  ON `fiji`.`quotes` (delta_1545) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
+CREATE INDEX `idx_quotes_underlying_symbol`  ON `fiji`.`quotes` (underlying_symbol) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
+CREATE INDEX `idx_quotes_underlying_dte`  ON `fiji`.`quotes` ((DATEDIFF(`expiration`, `quote_date`))) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
 
 -- SHOW INDEXES FROM quotes;
 
@@ -43,5 +44,27 @@ SELECT quotesA.idquotes, quotesA.underlying_symbol, quotesA.quote_date, quotesA.
 SELECT quote_date, root, expiration, strike, active_underlying_price_1545, option_type, bid_1545, ask_1545, delta_1545, theta_1545, DATEDIFF(expiration, quote_date) AS DTE, ABS(delta_1545 + .3) AS delta_30 FROM quotes
 	WHERE quote_date >= "2020-01-01" AND quote_date <= "2020-12-01" AND -- LIMIT RESULTS
     DATEDIFF(expiration, quote_date) > 30 AND DATEDIFF(expiration, quote_date) < 50
-    ORDER BY ABS(45 - DATEDIFF(expiration, quote_date)), ABS(delta_1545 + .3), quote_date
+    ORDER BY ABS(45 - DATEDIFF(expiration, quote_date)), ABS(delta_1545 + .3), quote_date;
+
+
+SELECT 
+(-1 * (`quotesCall`.`bid_1545` + `quotesCall`.`ask_1545`) / 2) + (-1 * (`quotesPut`.`bid_1545` + `quotesPut`.`ask_1545`) / 2) AS trade_price,
+quotesCall.idquotes, quotesCall.underlying_symbol, quotesCall.quote_date, quotesCall.root, quotesCall.expiration, quotesCall.strike, quotesCall.option_type, quotesCall.open, quotesCall.high, quotesCall.low, quotesCall.close, quotesCall.trade_volume, quotesCall.bid_size_1545, quotesCall.bid_1545, quotesCall.ask_size_1545, quotesCall.ask_1545, quotesCall.underlying_bid_1545, quotesCall.underlying_ask_1545, quotesCall.implied_underlying_price_1545, quotesCall.active_underlying_price_1545, quotesCall.implied_volatility_1545, quotesCall.delta_1545, quotesCall.gamma_1545, quotesCall.theta_1545, quotesCall.vega_1545, quotesCall.rho_1545, quotesCall.bid_size_eod, quotesCall.bid_eod, quotesCall.ask_size_eod, quotesCall.ask_eod, quotesCall.underlying_bid_eod, quotesCall.underlying_ask_eod, quotesCall.vwap, quotesCall.open_interest, quotesCall.delivery_code, (quotesCall.bid_1545 + quotesCall.ask_1545) / 2 AS quotesCall_mid_1545, (quotesCall.underlying_bid_1545 + quotesCall.underlying_ask_1545) / 2 AS quotesCall_underlying_mid_1545, (quotesCall.bid_eod + quotesCall.ask_eod) / 2 AS quotesCall_mid_eod, (quotesCall.underlying_bid_eod + quotesCall.underlying_ask_eod) / 2 AS quotesCall_underlying_mid_eod, DATEDIFF(quotesCall.expiration, quotesCall.quote_date) AS quotesCall_dte, quotesPut.idquotes, quotesPut.underlying_symbol, quotesPut.quote_date, quotesPut.root, quotesPut.expiration, quotesPut.strike, quotesPut.option_type, quotesPut.open, quotesPut.high, quotesPut.low, quotesPut.close, quotesPut.trade_volume, quotesPut.bid_size_1545, quotesPut.bid_1545, quotesPut.ask_size_1545, quotesPut.ask_1545, quotesPut.underlying_bid_1545, quotesPut.underlying_ask_1545, quotesPut.implied_underlying_price_1545, quotesPut.active_underlying_price_1545, quotesPut.implied_volatility_1545, quotesPut.delta_1545, quotesPut.gamma_1545, quotesPut.theta_1545, quotesPut.vega_1545, quotesPut.rho_1545, quotesPut.bid_size_eod, quotesPut.bid_eod, quotesPut.ask_size_eod, quotesPut.ask_eod, quotesPut.underlying_bid_eod, quotesPut.underlying_ask_eod, quotesPut.vwap, quotesPut.open_interest, quotesPut.delivery_code, (quotesPut.bid_1545 + quotesPut.ask_1545) / 2 AS quotesPut_mid_1545, (quotesPut.underlying_bid_1545 + quotesPut.underlying_ask_1545) / 2 AS quotesPut_underlying_mid_1545, (quotesPut.bid_eod + quotesPut.ask_eod) / 2 AS quotesPut_mid_eod, (quotesPut.underlying_bid_eod + quotesPut.underlying_ask_eod) / 2 AS quotesPut_underlying_mid_eod, DATEDIFF(quotesPut.expiration, quotesPut.quote_date) AS quotesPut_dte FROM quotes AS quotesCall, quotes AS quotesPut 
+WHERE `quotesCall`.`quote_date` = `quotesPut`.`quote_date` 
+AND `quotesCall`.`quote_date` > '2019-11-21' 
+AND `quotesPut`.`quote_date` > '2019-11-21' 
+AND `quotesCall`.`underlying_symbol` = '^RUT' 
+AND `quotesCall`.`root`              = 'RUTW' 
+AND `quotesCall`.`expiration`        = '2020-01-03' 
+AND `quotesCall`.`strike`            = 1625.0 
+AND `quotesCall`.`option_type`       = 'C' 
+AND `quotesPut`.`underlying_symbol` = '^RUT' 
+AND `quotesPut`.`root`              = 'RUTW' 
+AND `quotesPut`.`expiration`        = '2020-01-03' 
+AND `quotesPut`.`strike`            = 1540.0 
+AND `quotesPut`.`option_type`       = 'P'
+AND (DATEDIFF(`quotesCall`.`expiration`, `quotesCall`.`quote_date`) < 45 
+	OR (-1 * (`quotesCall`.`bid_1545` + `quotesCall`.`ask_1545`) / 2) + (-1 * (`quotesPut`.`bid_1545` + `quotesPut`.`ask_1545`) / 2) < -6340.9595 
+    OR (-1 * (`quotesCall`.`bid_1545` + `quotesCall`.`ask_1545`) / 2) + (-1 * (`quotesPut`.`bid_1545` + `quotesPut`.`ask_1545`) / 2) > -1585.2399) 
+ORDER BY quotesCall.quote_date
 

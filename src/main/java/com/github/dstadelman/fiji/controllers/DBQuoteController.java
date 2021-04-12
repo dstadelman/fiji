@@ -189,7 +189,7 @@ public class DBQuoteController extends DBController {
         f(s, table, "expiration");
         s.append(", ");
         f(s, table, "quote_date");
-        s.append(") / 2 AS ");
+        s.append(") AS ");
         n(s, table, "dte");
 
         return s.toString();
