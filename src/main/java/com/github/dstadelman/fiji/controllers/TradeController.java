@@ -426,12 +426,12 @@ public class TradeController {
             throw new IllegalTradeException(description + ": entry quote_date is not before exit quote_date (" + entry_idquotes + ", " + exit_idquotes + ")");
         }
 
-        if (!entry.root.equals(exit.root)) {
-            throw new IllegalTradeException(description + ": root does not match (" + entry_idquotes + ", " + exit_idquotes + ")");
-        }
-
         if (!entry.underlying_symbol.equals(exit.underlying_symbol)) {
             throw new IllegalTradeException(description + ": underlying_symbol does not match (" + entry_idquotes + ", " + exit_idquotes + ")");
+        }
+
+        if (!entry.root.equals(exit.root)) {
+            throw new IllegalTradeException(description + ": root does not match (" + entry_idquotes + ", " + exit_idquotes + ")");
         }
 
         if (!entry.strike.equals(exit.strike)) {
@@ -484,13 +484,13 @@ public class TradeController {
                 throw new IllegalTradeException("outright: entry quote_date is not before exit quote_date (" + t.entry_outright_idquotes + ", " + t.exit_outright_idquotes + ")");
             }
     
-            if (!entry.root.equals(exit.root)) {
-                throw new IllegalTradeException("outright: root does not match (" + t.entry_outright_idquotes + ", " + t.exit_outright_idquotes + ")");
-            }
-    
             if (!entry.underlying_symbol.equals(exit.underlying_symbol)) {
                 throw new IllegalTradeException("outright: underlying_symbol does not match (" + t.entry_outright_idquotes + ", " + t.exit_outright_idquotes + ")");
             }
+
+            if (!entry.root.equals(exit.root)) {
+                throw new IllegalTradeException("outright: root does not match (" + t.entry_outright_idquotes + ", " + t.exit_outright_idquotes + ")");
+            }            
         }
 
         validateTrade_Leg(t.entry_legA_idquotes, t.entry_legA_quantity, t.exit_legA_idquotes, t.exit_legA_quantity, quoteMap, "legA");

@@ -29,7 +29,7 @@ SELECT quotesA.idquotes AS idquotesA
 	, quotesB.idquotes AS idquotesB
 	, quotesA.quote_date
     , quotesA.active_underlying_price_1545 AS underlying_price
-    , quotesA.root
+    , quotesA.underlying_symbol
     , quotesA.expiration
     , quotesA.option_type AS option_typeA
     , quotesA.strike AS strikeA
@@ -48,15 +48,15 @@ SELECT quotesA.idquotes AS idquotesA
 	WHERE quotesA.quote_date = quotesB.quote_date
 		AND quotesA.quote_date 		> '2017-10-26'
         
-		AND quotesA.root 			= 'RUTW'
-        AND quotesA.expiration 		= '2017-12-08'
-        AND quotesA.strike 			= '1460'
-        AND quotesA.option_type 	= 'P'
+		AND quotesA.underlying_symbol   = '^RUT'
+        AND quotesA.expiration 		    = '2017-12-08'
+        AND quotesA.strike 			    = '1460'
+        AND quotesA.option_type 	    = 'P'
         
-		AND quotesB.root 			= 'RUTW'
-        AND quotesB.expiration 		= '2017-12-08'
-        AND quotesB.strike 			= '1530'
-        AND quotesB.option_type 	= 'C'        
+		AND quotesB.underlying_symbol   = '^RUT'
+        AND quotesB.expiration 		    = '2017-12-08'
+        AND quotesB.strike 			    = '1530'
+        AND quotesB.option_type 	    = 'C'        
         
         AND ( 
 			((quotesA.bid_1545 + quotesA.ask_1545) / 2) + ((quotesB.bid_1545 + quotesB.ask_1545) / 2)

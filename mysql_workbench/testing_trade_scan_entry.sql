@@ -46,7 +46,7 @@ ORDER BY quote_date, option_type;
 -- not complete
 SELECT
 	quotesA.idquotes AS idquotesA, quotesB.idquotes AS idquotesB,
-	quotesA.quote_date, quotesA.root, 
+	quotesA.quote_date, quotesA.underlying_symbol, 
 	quotesA.expiration AS expirationA, 
 	quotesB.expiration AS expirationB, 
 	quotesA.strike AS strikeA, quotesB.strike AS strikeB, 
@@ -61,7 +61,7 @@ SELECT
     , quotesA.strike - quotesB.strike AS strike_diff
 	FROM quotes AS quotesA, quotes AS quotesB
     WHERE 
-		quotesA.root = quotesB.root AND quotesA.expiration = quotesB.expiration AND quotesA.option_type = quotesB.option_type AND quotesA.strike - quotesB.strike > 0
+		quotesA.underlying_symbol = quotesB.underlying_symbol AND quotesA.expiration = quotesB.expiration AND quotesA.option_type = quotesB.option_type AND quotesA.strike - quotesB.strike > 0
         AND quotesA.strike - quotesB.strike < 100
         AND ((quotesA.option_type = 'C' AND quotesA.strike > quotesA.active_underlying_price_1545 AND quotesB.strike > quotesA.active_underlying_price_1545) OR (quotesA.option_type = 'P' AND quotesA.strike < quotesA.active_underlying_price_1545 AND quotesB.strike < quotesA.active_underlying_price_1545))
 		AND quotesA.quote_date = "2020-01-02" AND quotesA.expiration = "2020-02-14" -- LIMIT RESULTS

@@ -93,14 +93,13 @@ public class StrangleController implements ITradeStratController {
             +       ", RANK() OVER (PARTITION BY `expiration` ORDER BY ABS(DATEDIFF(`expiration`, `quote_date`) - ?), ABS(`delta_1545` - ?)) AS `expiration_rank_delta_high`"
             +       " FROM quotes"
             +       " WHERE `underlying_symbol` = ?"
-            +           " AND (`root` = 'RUT' OR `root` = 'RUTW')"
             +           " AND DATEDIFF(`expiration`, ?) > ? AND `expiration` < ?"
             +           " AND DATEDIFF(`expiration`, `quote_date`) > ?"
             +           " AND DATEDIFF(`expiration`, `quote_date`) < ?"
             +           " AND `delta_1545` <> 0"
             // +           " AND `expiration` >= '2020-01-03' AND `expiration` <= '2020-12-31'" // LIMIT RESULTS
             +   ") sub"
-            + " WHERE `expiration_rank_delta_low` = 1 OR `expiration_rank_delta_high` = 1"
+            + " WHERE (`expiration_rank_delta_low` = 1 AND `option_type` = 'P') OR (`expiration_rank_delta_high` = 1 AND `option_type` = 'C')"
             + " ORDER BY `quote_date`, `option_type`;";
 
             PreparedStatement psEntries = c.prepareStatement(sqlEntries); 
@@ -115,24 +114,37 @@ public class StrangleController implements ITradeStratController {
             psEntries.setInt       (9 , (tstrat.entryDTE - 10) < 1 ? 1 : tstrat.entryDTE - 10);
             psEntries.setInt       (10, tstrat.entryDTE + 10);
 
-            // System.out.println(psEntries.toString());
+            System.out.println(psEntries.toString());
 
             ResultSet rsEntries = psEntries.executeQuery();
+
+            boolean rsMore = rsEntries.next();
             
-            while (rsEntries.next()) {
+            while (rsMore) {
+
+                // there are some strange records in the RUT dataset where these special cases need to be handled
 
                 Quote entryQuotesCall = DBQuoteController.quoteLoad(null, rsEntries);
                 if (!entryQuotesCall.option_type.equals("C")) {
-                    throw new IllegalTradeException("query should return a call before a put");
+
+                    rsMore = rsEntries.next();
+                    continue;
+                    //throw new IllegalTradeException("query should return a call before a put");
                 }
 
-                if (!rsEntries.next()) {
-                    throw new IllegalTradeException("not enough matches in query results");
+                rsMore = rsEntries.next();
+
+                if (!rsMore) {
+
+                    break;
+                    //throw new IllegalTradeException("not enough matches in query results");
                 }
 
                 Quote entryQuotesPut = DBQuoteController.quoteLoad(null, rsEntries);
                 if (!entryQuotesPut.option_type.equals("P")) {
-                    throw new IllegalTradeException("matching put not found for call");
+                    
+                    continue;
+                    // throw new IllegalTradeException("matching put not found for call");
                 }
 
                 if (!entryQuotesCall.quote_date.equals(entryQuotesPut.quote_date)) {
@@ -143,13 +155,9 @@ public class StrangleController implements ITradeStratController {
                     throw new IllegalTradeException("call and put expiration do not match");
                 }
 
-                if (!entryQuotesCall.root.equals(entryQuotesPut.root)) {
-                    throw new IllegalTradeException("call and put root do not match");
-                }                
-
                 if (!entryQuotesCall.underlying_symbol.equals(entryQuotesPut.underlying_symbol)) {
                     throw new IllegalTradeException("call and put underlying_symbol do not match");
-                }                                
+                }                
 
                 quoteMap.put(entryQuotesCall.idquotes, entryQuotesCall);
                 quoteMap.put(entryQuotesPut.idquotes, entryQuotesPut);
