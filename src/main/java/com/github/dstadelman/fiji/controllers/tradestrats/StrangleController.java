@@ -97,7 +97,7 @@ public class StrangleController implements ITradeStratController {
             +           " AND DATEDIFF(`expiration`, `quote_date`) > ?"
             +           " AND DATEDIFF(`expiration`, `quote_date`) < ?"
             +           " AND `delta_1545` <> 0"
-            // +           " AND `expiration` >= '2020-01-03' AND `expiration` <= '2020-12-31'" // LIMIT RESULTS
+            +           " AND `expiration` >= '2004-01-01' AND `expiration` <= '2004-12-01'" // LIMIT RESULTS
             +   ") sub"
             + " WHERE (`expiration_rank_delta_low` = 1 AND `option_type` = 'P') OR (`expiration_rank_delta_high` = 1 AND `option_type` = 'C')"
             + " ORDER BY `quote_date`, `option_type`;";
