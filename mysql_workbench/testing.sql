@@ -40,26 +40,33 @@
 --     ;
 
 
-SELECT * FROM (
+SELECT `expiration` 
+FROM quotes 
+WHERE 	DATEDIFF(`expiration`, '2004-01-02') > 55							-- first date of data
+	AND `expiration` < "2021-01-15"											-- last date of data
+GROUP BY `expiration`;
 
-SELECT quotesPut.idquotes AS idquotes_put, quotesPut.quote_date AS quote_date_put, quotesPut.underlying_symbol AS underlying_symbol_put, quotesPut.strike AS strike_put, quotesPut.active_underlying_price_1545 AS active_underlying_price_1545_put, quotesPut.option_type AS option_type_put, quotesPut.delta_1545 AS delta_1545_put
+
+-- SELECT * FROM (
+
+SELECT quotesPut.quote_date AS quote_date_put, quotesPut.underlying_symbol AS underlying_symbol_put, quotesPut.expiration expiration_put, quotesPut.strike AS strike_put, quotesPut.active_underlying_price_1545 AS active_underlying_price_1545_put, quotesPut.option_type AS option_type_put, quotesPut.delta_1545 AS delta_1545_put
 	, DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) AS PutDTE
-	, quotesCall.idquotes AS idquotes_call, quotesCall.quote_date AS quote_date_call, quotesCall.underlying_symbol AS underlying_symbol_call, quotesCall.strike AS strike_call, quotesCall.active_underlying_price_1545 AS active_underlying_price_1545_call, quotesCall.option_type AS option_type_call, quotesCall.delta_1545 AS delta_1545_call
+	, quotesCall.quote_date AS quote_date_call, quotesCall.underlying_symbol AS underlying_symbol_call, quotesCall.expiration AS expiration_call, quotesCall.strike AS strike_call, quotesCall.active_underlying_price_1545 AS active_underlying_price_1545_call, quotesCall.option_type AS option_type_call, quotesCall.delta_1545 AS delta_1545_call
 	, DATEDIFF(`quotesCall`.`expiration`, `quotesCall`.`quote_date`) AS CallDTE
 	, RANK() OVER (PARTITION BY `quotesPut`.`expiration` ORDER BY 
-		ABS(`quotesPut`.`delta_1545` - -.3) + ABS(`quotesCall`.`delta_1545` - .3), ABS(DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) - 45)
-	) AS expiration_rank_delta
-	FROM quotes AS quotesPut, quotes AS quotesCall
-	WHERE   `quotesPut`.`quote_date` = `quotesCall`.`quote_date`
-		AND `quotesPut`.`expiration` = `quotesCall`.`expiration`
-		AND DATEDIFF(`quotesPut`.`expiration`, '2004-01-02') > 55							-- first date of data
-		AND `quotesPut`.`expiration` < "2021-01-15"											-- last date of data
-		AND DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) > 35				-- ensure close to desired DTE maybe make this a percentage (20%) of DTE
-        AND DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) < 55				-- 
-        AND `quotesPut`.`delta_1545` < -.3 + .1 AND `quotesPut`.`delta_1545` > -.3 - .1		-- ensure the delta is close to the desired delta to cut down on results
-        AND `quotesCall`.`delta_1545` < .3 + .1 AND `quotesCall`.`delta_1545` > .3 - .1
-		-- AND expiration >= "2020-01-03" AND expiration <= "2020-12-31" -- LIMIT RESULTS
-        -- AND `quotesPut`.`expiration` = "2004-02-21"  -- LIMIT RESULTS
-	ORDER BY expiration_rank_delta
+		ABS(DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) - 45), ABS(`quotesPut`.`delta_1545` - -.3) + ABS(`quotesCall`.`delta_1545` - .3)
+	) AS dte_delta_1545_rank
+FROM quotes AS quotesPut, quotes AS quotesCall
+WHERE   `quotesPut`.`quote_date` = `quotesCall`.`quote_date`
+	AND `quotesPut`.`expiration` = `quotesCall`.`expiration`
+	AND DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) > 35				-- ensure close to desired DTE maybe make this a percentage (20%) of DTE
+	AND DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) < 55				-- 
+	AND `quotesPut`.`delta_1545` < -.3 + .1 AND `quotesPut`.`delta_1545` > -.3 - .1		-- ensure the delta is close to the desired delta to cut down on results
+	AND `quotesCall`.`delta_1545` < .3 + .1 AND `quotesCall`.`delta_1545` > .3 - .1
+	-- AND expiration >= "2020-01-03" AND expiration <= "2020-12-31" -- LIMIT RESULTS
+	-- AND `quotesPut`.`expiration` < "2010-02-21"  -- LIMIT RESULTS
+	AND `quotesPut`.`expiration` = '2007-01-20'
+ORDER BY dte_delta_1545_rank
+LIMIT 1
 
-) sub WHERE expiration_rank_delta = 1
+-- ) sub WHERE dte_delta_1545_rank = 1 ORDER BY `quote_date_put`, `quote_date_put`
