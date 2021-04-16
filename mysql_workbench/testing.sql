@@ -53,16 +53,18 @@ SELECT quotesPut.quote_date AS quote_date_put, quotesPut.underlying_symbol AS un
 	, DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) AS PutDTE
 	, quotesCall.quote_date AS quote_date_call, quotesCall.underlying_symbol AS underlying_symbol_call, quotesCall.expiration AS expiration_call, quotesCall.strike AS strike_call, quotesCall.active_underlying_price_1545 AS active_underlying_price_1545_call, quotesCall.option_type AS option_type_call, quotesCall.delta_1545 AS delta_1545_call
 	, DATEDIFF(`quotesCall`.`expiration`, `quotesCall`.`quote_date`) AS CallDTE
-	, RANK() OVER (PARTITION BY `quotesPut`.`expiration` ORDER BY 
-		ABS(DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) - 45), ABS(`quotesPut`.`delta_1545` - -.3) + ABS(`quotesCall`.`delta_1545` - .3)
-	) AS dte_delta_1545_rank
+-- 	, RANK() OVER (PARTITION BY `quotesPut`.`expiration` ORDER BY 
+-- 		ABS(DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) - 45), ABS(`quotesPut`.`delta_1545` - -.3) + ABS(`quotesCall`.`delta_1545` - .3)
+-- 	) AS dte_delta_1545_rank
+	,	((ABS(`quotesPut`.`delta_1545` - -.3) + ABS(`quotesCall`.`delta_1545` - .3)) / .05) + ABS(DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) - 45) AS dte_delta_1545_rank
 FROM quotes AS quotesPut, quotes AS quotesCall
 WHERE   `quotesPut`.`quote_date` = `quotesCall`.`quote_date`
 	AND `quotesPut`.`expiration` = `quotesCall`.`expiration`
-	AND DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) > 35				-- ensure close to desired DTE maybe make this a percentage (20%) of DTE
-	AND DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) < 55				-- 
-	AND `quotesPut`.`delta_1545` < -.3 + .1 AND `quotesPut`.`delta_1545` > -.3 - .1		-- ensure the delta is close to the desired delta to cut down on results
-	AND `quotesCall`.`delta_1545` < .3 + .1 AND `quotesCall`.`delta_1545` > .3 - .1
+    AND ((ABS(`quotesPut`.`delta_1545` - -.3) + ABS(`quotesCall`.`delta_1545` - .3)) / .05) + ABS(DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) - 45) < 5
+	AND DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) > 35				-- make query faster
+	AND DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) < 55				-- make query faster
+	AND `quotesPut`.`delta_1545` < -.3 + .2 AND `quotesPut`.`delta_1545` > -.3 - .2		-- make query faster
+	AND `quotesCall`.`delta_1545` < .3 + .2 AND `quotesCall`.`delta_1545` > .3 - .2		-- make query faster
 	-- AND expiration >= "2020-01-03" AND expiration <= "2020-12-31" -- LIMIT RESULTS
 	-- AND `quotesPut`.`expiration` < "2010-02-21"  -- LIMIT RESULTS
 	AND `quotesPut`.`expiration` = '2007-01-20'
