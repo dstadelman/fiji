@@ -35,6 +35,10 @@ public class DBQuoteControllerTest {
                 Quote quoteB = DBQuoteController.quoteLoad("quotesB", rs);
                 System.out.println(quoteA.underlying_symbol);
                 System.out.println(quoteB.underlying_symbol);
+
+                assertTrue(quoteA.idquotes == 1);
+                assertTrue(quoteB.idquotes == 2);
+
                 assertTrue("^RUT".equals(quoteA.underlying_symbol));
                 assertTrue("^RUT".equals(quoteB.underlying_symbol));
 

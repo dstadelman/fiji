@@ -37,8 +37,4 @@ CREATE TABLE `quotes` (
   `open_interest` int NOT NULL,
   `delivery_code` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`idquotes`),
-  KEY `idx_quotes_quote_date` (`quote_date`),
-  KEY `idx_quotes_expiration` (`expiration`),
-  KEY `idx_quotes_option_type` (`option_type`),
-  KEY `idx_quotes_strike` (`strike`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

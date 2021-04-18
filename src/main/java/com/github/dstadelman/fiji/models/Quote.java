@@ -58,4 +58,7 @@ public class Quote {
     public float mid_eod;
     public float underlying_mid_eod;
     public int dte;
+    public float delta_binned_1545;
+    public float delta_binned_eod;
+
 }

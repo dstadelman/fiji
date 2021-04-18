@@ -31,19 +31,32 @@ public class DBController {
         }
     }
 
-    public static String f(String table, String field) {
-        if (table != null)
-            return table + "." + field;
-        else
-            return field;
-    }
+    // public static String f(String table, String field) {
+    //     if (table != null)
+    //         return table + "." + field;
+    //     else
+    //         return field;
+    // }
 
+    // field
     public static void f(StringBuffer s, String table, String field) {
         if (table != null)
             s.append(table + ".");
         s.append(field);
     }
 
+    // field as
+    public static void fa(StringBuffer s, String table, String field) {
+        if (table != null)
+            s.append(table + ".");
+        s.append(field);
+        if (table != null) {
+            s.append(" AS ");
+            n(s, table, field);
+        }
+    }    
+
+    // name
     public static String n(String table, String field) {
         if (table != null)
             return table + "_" + field;
@@ -51,6 +64,7 @@ public class DBController {
             return field;
     }
 
+    // name
     public static void n(StringBuffer s, String table, String field) {
         if (table != null)
             s.append(table + "_");
