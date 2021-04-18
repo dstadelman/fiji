@@ -12,6 +12,12 @@
 -- CREATE INDEX `idx_quotes_underlying_symbol`  ON `fiji`.`quotes` (underlying_symbol) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
 -- CREATE INDEX `idx_quotes_underlying_dte`  ON `fiji`.`quotes` ((DATEDIFF(`expiration`, `quote_date`))) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
 
+-- CREATE INDEX `idx_quotes_expiration_underlying_symbol`  ON `fiji`.`quotes` (expiration, underlying_symbol) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT	OK	0.000 sec
+-- CREATE INDEX `idx_quotes_underlying_symbol_quote_date_expiration_delta_1545`  ON `fiji`.`quotes` (underlying_symbol, quote_date, expiration, delta_1545) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT
+-- CREATE INDEX `idx_quotes_underlying_symbol_expiration_option_type_strike`  ON `fiji`.`quotes` (underlying_symbol, expiration, option_type, strike) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT
+
+
+
 -- SHOW INDEXES FROM quotes;
 
 -- SELECT quote_date, root, expiration, strike, active_underlying_price_1545, option_type, bid_1545, ask_1545, delta_1545, theta_1545 FROM quotes WHERE quote_date > "2020-12-10" AND expiration = "2021-02-19" AND option_type = 'P' AND strike = 2120;
