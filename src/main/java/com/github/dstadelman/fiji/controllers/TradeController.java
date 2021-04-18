@@ -430,9 +430,10 @@ public class TradeController {
             throw new IllegalTradeException(description + ": underlying_symbol does not match (" + entry_idquotes + ", " + exit_idquotes + ")");
         }
 
-        if (!entry.root.equals(exit.root)) {
-            throw new IllegalTradeException(description + ": root does not match (" + entry_idquotes + ", " + exit_idquotes + ")");
-        }
+        // root field seem to change for the same underlying, strike, option_type on different days - ???
+        // if (!entry.root.equals(exit.root)) {
+        //     throw new IllegalTradeException(description + ": root does not match (" + entry_idquotes + ", " + exit_idquotes + ")");
+        // }
 
         if (!entry.strike.equals(exit.strike)) {
             throw new IllegalTradeException(description + ": strike does not match (" + entry_idquotes + ", " + exit_idquotes + ")");
@@ -488,9 +489,10 @@ public class TradeController {
                 throw new IllegalTradeException("outright: underlying_symbol does not match (" + t.entry_outright_idquotes + ", " + t.exit_outright_idquotes + ")");
             }
 
-            if (!entry.root.equals(exit.root)) {
-                throw new IllegalTradeException("outright: root does not match (" + t.entry_outright_idquotes + ", " + t.exit_outright_idquotes + ")");
-            }            
+            // root field seem to change for the same underlying, strike, option_type on different days - ???
+            // if (!entry.root.equals(exit.root)) {
+            //     throw new IllegalTradeException("outright: root does not match (" + t.entry_outright_idquotes + ", " + t.exit_outright_idquotes + ")");
+            // }            
         }
 
         validateTrade_Leg(t.entry_legA_idquotes, t.entry_legA_quantity, t.exit_legA_idquotes, t.exit_legA_quantity, quoteMap, "legA");

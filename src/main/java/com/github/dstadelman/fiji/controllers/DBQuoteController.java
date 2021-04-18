@@ -69,14 +69,17 @@ public class DBQuoteController extends DBController {
 
         String sql = "SELECT " + DBQuoteController.quoteColumns(null)
             + " FROM quotes"
-            + " WHERE underlying_symbol = ? AND root = ? AND quote_date = ? AND strike = ? AND option_type = ? LIMIT 1";
+            // + " WHERE underlying_symbol = ? AND root = ? AND quote_date = ? AND strike = ? AND option_type = ? LIMIT 1";
+            + " WHERE underlying_symbol = ? AND quote_date = ? AND strike = ? AND option_type = ? LIMIT 1";
+
+        int ps_pos = 1;
 
         PreparedStatement ps = c.prepareStatement(sql); 
-        ps.setString    (1, entry.underlying_symbol);
-        ps.setString    (2, entry.root);
-        ps.setDate      (3, java.sql.Date.valueOf(currDate));
-        ps.setFloat     (4, entry.strike);
-        ps.setString    (5, entry.option_type);
+        ps.setString    (ps_pos++, entry.underlying_symbol);
+        // ps.setString    (ps_pos++, entry.root);
+        ps.setDate      (ps_pos++, java.sql.Date.valueOf(currDate));
+        ps.setFloat     (ps_pos++, entry.strike);
+        ps.setString    (ps_pos++, entry.option_type);
         ResultSet rs = ps.executeQuery();
 
         while (rs.next())
@@ -97,12 +100,15 @@ public class DBQuoteController extends DBController {
 
         String sql = "SELECT " + DBQuoteController.quoteColumns(null)
             + " FROM quotes"
-            + " WHERE underlying_symbol = ? AND root = ? AND quote_date = ? LIMIT 1";
+            // + " WHERE underlying_symbol = ? AND root = ? AND quote_date = ? LIMIT 1";
+            + " WHERE underlying_symbol = ? AND quote_date = ? LIMIT 1";
+
+        int ps_pos = 1;
 
         PreparedStatement ps = c.prepareStatement(sql); 
-        ps.setString    (1, entry.underlying_symbol);
-        ps.setString    (2, entry.root);
-        ps.setDate      (3, java.sql.Date.valueOf(currDate));
+        ps.setString    (ps_pos++, entry.underlying_symbol);
+        // ps.setString    (ps_pos++, entry.root);
+        ps.setDate      (ps_pos++, java.sql.Date.valueOf(currDate));
         ResultSet rs = ps.executeQuery();
 
         while (rs.next())

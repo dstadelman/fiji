@@ -1,26 +1,33 @@
 # fiji
 
-Options strategy backtest framework using *Cboe End-of-Day Option Quotes with Calcs*
+Fast, interactive, backtest, framework of options stratiegies in a command shell using *Cboe End-of-Day Option Quotes with Calcs*
 
-Framework supports underlying with four legs of options.
+Supports trades with short/long underlying with for four short/long option legs.
 
-Fiji is tightly coupled with hibernate + MySQL 8 queries - a little gross, but speed of implementation was considered over "really nice code." Expect hibernate and MySQL 8 all over the code base!
+Currently supported trades
+
+* Buy and Hold
+* Put (Short/Long)
+* Call (Short/Long)
+* Strangle (Short/Long)
+
+Fiji is tightly coupled with hibernate + MySQL 8 queries - as a software engineer, this is gross, but speed of implementation is priority over "really nice code."
 
 ## DISCLAIMER 
 
 This isn't trading or investment advice. Please see LICENSE, especially the sections *Disclaimer of Warranty* and *Limitation of Liability*. 
 
-As everything in life, take your time and start small. 
+There are probably errors in this code! As everything in life, take your time and start small. If something seems too good to be true, you're probably missing something.
 
-There is no Cboe data in this repository and it won't be given away. Cboe must be paid for their work. Please support folks that make good data available for such a small amount!
-
-## Assumptions
-
-A programmer has purchased some *Cboe End-of-Day Option Quotes with Calcs* data and would like to load this data into MySQL and run some options strategies *that they have programmed themselves* against it. 
+There is no Cboe data in this repository and it won't be given away!
 
 ## Data
 
+Where to find data
+
 [Cboe End-of-Day Option Quotes with Calcs Specifications](https://datashop.cboe.com/documents/end_of_day_option_quotes_with_calcs_layout.pdf)
+
+Fiji has been tested with symbol "^RUT".
 
 ## References
 
@@ -79,8 +86,6 @@ https://en.wikipedia.org/wiki/Sharpe_ratio
 
 * Create tables
    * Create `quotes` table: `mysql_workbench/quotes_create.sql`
-   * Create `tradestrats` table: `mysql_workbench/tradestrats_create.sql`
-   * Create `trades` table: `mysql_workbench/trades_create.sql`
 * Sample CSV import: `mysql_workbench/quotes_import_csv.sql`
 * Bash script to make SQL file to insert all CSV files into database (use Git Bash include in Git for Windows): `mysql_workbench/quotes_import_csv.sh`
 

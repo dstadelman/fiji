@@ -4,8 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.github.dstadelman.fiji.controllers.DBQuoteController;
@@ -39,11 +42,16 @@ public class StrangleController implements ITradeStratController {
     @Override
     public List<Trade> generate(QuoteMap quoteMap) throws SQLException, QuoteNotFoundException, IllegalTradeException {
 
+        Connection c = DBCPDataSource.getConnection();
+
+        // ********************************************************************
+        // boundary data
+
         LocalDate quoteDateFirst = null;
         LocalDate quoteDateLast = null;
 
         {
-            Connection c = DBCPDataSource.getConnection();
+            // first quote_date
             String sql = "SELECT " + DBQuoteController.quoteColumns(null) + " FROM quotes WHERE `underlying_symbol` = ? ORDER BY `quote_date` LIMIT 1;";
 
             PreparedStatement ps = c.prepareStatement(sql); 
@@ -57,13 +65,13 @@ public class StrangleController implements ITradeStratController {
             }
 
             Quote quote = DBQuoteController.quoteLoad(null, rs);
-            rs.close(); ps.close(); c.close();
+            rs.close(); ps.close(); // c.close();
 
             quoteDateFirst = quote.quote_date;
         }
 
         {
-            Connection c = DBCPDataSource.getConnection();
+            // last quote_date
             String sql = "SELECT " + DBQuoteController.quoteColumns(null) + " FROM quotes WHERE `underlying_symbol` = ? ORDER BY `quote_date` DESC LIMIT 1;";
 
             PreparedStatement ps = c.prepareStatement(sql); 
@@ -77,202 +85,222 @@ public class StrangleController implements ITradeStratController {
             }
 
             Quote quote = DBQuoteController.quoteLoad(null, rs);
-            rs.close(); ps.close(); c.close();
+            rs.close(); ps.close(); // c.close();
 
             quoteDateLast = quote.quote_date;
         }
 
-        List<Trade> trades = new ArrayList<Trade>();
+        List<LocalDate> expirations = new ArrayList<LocalDate>();
 
         {
-            Connection c = DBCPDataSource.getConnection();
+            // last quote_date
+            String sql = "SELECT `expiration`"
+            +   " FROM quotes"
+            +   " WHERE  `underlying_symbol` = ?"           // underlying_symbol
+            +       " AND `expiration` > ?"                 // first date of data + entryDTE + 10
+            +       " AND `expiration` < ?"                 // last date of data
+            +       " GROUP BY `expiration`";
 
-            String sqlEntries = "SELECT * FROM ("
-            +   "SELECT " + DBQuoteController.quoteColumns(null)
-            +       ", RANK() OVER (PARTITION BY `expiration` ORDER BY ABS(DATEDIFF(`expiration`, `quote_date`) - ?), ABS(`delta_1545` - ?)) AS `expiration_rank_delta_low`"
-            +       ", RANK() OVER (PARTITION BY `expiration` ORDER BY ABS(DATEDIFF(`expiration`, `quote_date`) - ?), ABS(`delta_1545` - ?)) AS `expiration_rank_delta_high`"
-            +       " FROM quotes"
-            +       " WHERE `underlying_symbol` = ?"
-            +           " AND DATEDIFF(`expiration`, ?) > ? AND `expiration` < ?"
-            +           " AND DATEDIFF(`expiration`, `quote_date`) > ?"
-            +           " AND DATEDIFF(`expiration`, `quote_date`) < ?"
-            +           " AND `delta_1545` <> 0"
-            +           " AND `expiration` >= '2004-01-01' AND `expiration` <= '2004-12-01'" // LIMIT RESULTS
-            +   ") sub"
-            + " WHERE (`expiration_rank_delta_low` = 1 AND `option_type` = 'P') OR (`expiration_rank_delta_high` = 1 AND `option_type` = 'C')"
-            + " ORDER BY `quote_date`, `option_type`;";
+            int ps_pos = 1;
+            PreparedStatement ps = c.prepareStatement(sql); 
+            ps.setString    (ps_pos++, tstrat.underlying_symbol);
+            ps.setDate      (ps_pos++, java.sql.Date.valueOf(quoteDateFirst.plusDays(tstrat.entryDTE + 10)));
+            ps.setDate      (ps_pos++, java.sql.Date.valueOf(quoteDateLast));
+            ResultSet rs = ps.executeQuery();
 
-            PreparedStatement psEntries = c.prepareStatement(sqlEntries); 
-            psEntries.setInt       (1 , tstrat.entryDTE);
-            psEntries.setFloat     (2 , tstrat.deltaPut);
-            psEntries.setInt       (3 , tstrat.entryDTE);
-            psEntries.setFloat     (4 , tstrat.deltaCall);
-            psEntries.setString    (5 , tstrat.underlying_symbol);
-            psEntries.setDate      (6 , java.sql.Date.valueOf(quoteDateFirst));
-            psEntries.setInt       (7 , tstrat.entryDTE);
-            psEntries.setDate      (8 , java.sql.Date.valueOf(quoteDateLast));
-            psEntries.setInt       (9 , (tstrat.entryDTE - 10) < 1 ? 1 : tstrat.entryDTE - 10);
-            psEntries.setInt       (10, tstrat.entryDTE + 10);
+            while (rs.next()) {
+                Date expiration = rs.getDate("expiration");
+                expirations.add(Instant.ofEpochMilli(expiration.getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+            }
 
-            System.out.println(psEntries.toString());
+            if (expirations.size() <= 0) {
+                rs.close(); ps.close(); c.close();
+                throw new QuoteNotFoundException("no valid expirations");
+            }
 
-            ResultSet rsEntries = psEntries.executeQuery();
+            rs.close(); ps.close(); // c.close();
+        }        
 
-            boolean rsMore = rsEntries.next();
+        // ********************************************************************
+        // prepared statements
+
+        String sqlEntry = "SELECT" 
+        +   " " + DBQuoteController.quoteColumns("quotesCall") + ", " + DBQuoteController.quoteColumns("quotesPut") 
+        // I really tried to do this with a MySQL window function RANK. Maybe I don't know what I am doing, 
+        // but getting expirations first and then looping through them is the fastest I could make the query work.
+        // +   ", RANK() OVER (PARTITION BY `quotesPut`.`expiration` ORDER BY"
+        // +       " ABS(DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) - 45), ABS(`quotesPut`.`delta_1545` - -.3) + ABS(`quotesCall`.`delta_1545` - .3)"
+        // +   ") AS dte_delta_1545_rank"
+        +   ", ((ABS(`quotesPut`.`delta_1545` - -.3) + ABS(`quotesCall`.`delta_1545` - .3)) / .05) + ABS(DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) - 45) AS dte_delta_1545_rank"
+        +   " FROM quotes AS quotesCall, quotes AS quotesPut"
+        +   " WHERE `quotesCall`.`underlying_symbol` = ? AND `quotesPut`.`underlying_symbol` = ?"
+																							// underlying_symbol
+																							// underlying_symbol																							
+        +       " AND `quotesCall`.`quote_date` = `quotesPut`.`quote_date`"
+        // +       " AND `quotesCall`.`expiration` = `quotesPut`.`expiration`"
+        +       " AND `quotesCall`.`expiration` = ? AND `quotesPut`.`expiration` = ?"		// expiration            
+																							// expiration            		
+        +       " AND ( (ABS(`quotesCall`.`delta_1545` - ?) + ABS(`quotesPut`.`delta_1545` - ?)) / .05)"
+        +           " + (ABS(DATEDIFF(`quotesCall`.`expiration`, `quotesCall`.`quote_date`) - ?) + ABS(DATEDIFF(`quotesPut`.`expiration`, `quotesPut`.`quote_date`) - ?)) / 2 < 5"
+                                                                                            // delta call                                                                                    
+                                                                                            // delta put
+                                                                                            // entryDTE
+                                                                                            // entryDTE
+        +   " ORDER BY dte_delta_1545_rank"
+        +   " LIMIT 1";
+
+        PreparedStatement psEntry = c.prepareStatement(sqlEntry);         
+
+
+        String sqlExit = "SELECT" 
+        +   " " + DBQuoteController.quoteColumns("quotesCall") + ", " + DBQuoteController.quoteColumns("quotesPut") 
+        +   " FROM quotes AS quotesCall, quotes AS quotesPut"
+        +   " WHERE   `quotesCall`.`quote_date` = `quotesPut`.`quote_date`"
+        +       " AND `quotesCall`.`quote_date` > ? AND `quotesPut`.`quote_date` > ?"
+
+        +       " AND `quotesCall`.`underlying_symbol` = ?"
+        // +       " AND `quotesCall`.`root`              = ?"
+        +       " AND `quotesCall`.`expiration`        = ?"
+        +       " AND `quotesCall`.`strike`            = ?"
+        +       " AND `quotesCall`.`option_type`       = ?"
+
+        +       " AND `quotesPut`.`underlying_symbol` = ?"                
+        // +       " AND `quotesPut`.`root`              = ?"
+        +       " AND `quotesPut`.`expiration`        = ?"
+        +       " AND `quotesPut`.`strike`            = ?"
+        +       " AND `quotesPut`.`option_type`       = ?";
+        
+        if (tstrat.exitDTE == null && tstrat.exitPercentLoss == null && tstrat.exitPercentProfit == null) {
+            // hold to expiry... the data actually might not be too good for this case as you are simulating
+            // selling at 15 minutes before close
+            sqlExit += " ORDER BY quotesCall.quote_date DESC LIMIT 1";
+        } else {
+            String sqlExitSub = "";
+
+            sqlExitSub +=   !sqlExitSub.isEmpty() ? " OR " : "";
+            sqlExitSub +=   tstrat.exitDTE != null           ? "DATEDIFF(`quotesCall`.`expiration`, `quotesCall`.`quote_date`) <= ?" : "";
+            sqlExitSub +=   !sqlExitSub.isEmpty() ? " OR " : "";
+            sqlExitSub +=   tstrat.exitPercentLoss != null   ? "(? * ((`quotesCall`.`bid_1545` + `quotesCall`.`ask_1545`) / 2)) + (? * ((`quotesPut`.`bid_1545` + `quotesPut`.`ask_1545`) / 2)) < ?" : "";
+            sqlExitSub +=   !sqlExitSub.isEmpty() ? " OR " : "";
+            sqlExitSub +=   tstrat.exitPercentProfit != null ? "(? * ((`quotesCall`.`bid_1545` + `quotesCall`.`ask_1545`) / 2)) + (? * ((`quotesPut`.`bid_1545` + `quotesPut`.`ask_1545`) / 2)) > ?" : "";
+
+            sqlExit += " AND (" + sqlExitSub + ") ORDER BY quotesCall.quote_date LIMIT 1";
+        }
+
+        PreparedStatement psExit = c.prepareStatement(sqlExit); 
+
+
+        // ********************************************************************
+        // main trade loop        
+
+        List<Trade> trades = new ArrayList<Trade>();
+
+        for (LocalDate expiration : expirations) {
+
+            // main entry / exit loop
+
+            int psEntry_pos = 1;
+            psEntry.setString    (psEntry_pos++, tstrat.underlying_symbol);
+            psEntry.setString    (psEntry_pos++, tstrat.underlying_symbol);
+            psEntry.setDate      (psEntry_pos++, java.sql.Date.valueOf(expiration));
+            psEntry.setDate      (psEntry_pos++, java.sql.Date.valueOf(expiration));
+            psEntry.setFloat     (psEntry_pos++, tstrat.deltaCall);
+            psEntry.setFloat     (psEntry_pos++, tstrat.deltaPut);
+            psEntry.setInt       (psEntry_pos++, tstrat.entryDTE);
+            psEntry.setInt       (psEntry_pos++, tstrat.entryDTE);
+
+            ResultSet rsEntry = psEntry.executeQuery();
+
+            if (!rsEntry.next()) {
+                rsEntry.close(); // psEntry.close(); // c.close();
+                // not an error here... nothing found for this expiry
+                continue;
+            }
+
+            Quote entryQuotesCall   = DBQuoteController.quoteLoad("quotesCall", rsEntry);
+            Quote entryQuotesPut    = DBQuoteController.quoteLoad("quotesPut",  rsEntry);
+
+            if (!entryQuotesCall.quote_date.equals(entryQuotesPut.quote_date)) {
+                rsEntry.close(); psEntry.close(); psExit.close(); c.close();
+                throw new IllegalTradeException("call and put quote_date do not match");
+            }
             
-            while (rsMore) {
+            if (!entryQuotesCall.expiration.equals(entryQuotesPut.expiration)) {
+                rsEntry.close(); psEntry.close(); psExit.close(); c.close();
+                throw new IllegalTradeException("call and put expiration do not match");
+            }
 
-                // there are some strange records in the RUT dataset where these special cases need to be handled
+            if (!entryQuotesCall.underlying_symbol.equals(entryQuotesPut.underlying_symbol)) {
+                rsEntry.close(); psEntry.close(); psExit.close(); c.close();
+                throw new IllegalTradeException("call and put underlying_symbol do not match");
+            }                
+            
+            quoteMap.put(entryQuotesCall.idquotes,  entryQuotesCall);
+            quoteMap.put(entryQuotesPut.idquotes,   entryQuotesPut);
 
-                Quote entryQuotesCall = DBQuoteController.quoteLoad(null, rsEntries);
-                if (!entryQuotesCall.option_type.equals("C")) {
+            rsEntry.close(); // psEntry.close(); // c.close();
 
-                    rsMore = rsEntries.next();
-                    continue;
-                    //throw new IllegalTradeException("query should return a call before a put");
-                }
 
-                rsMore = rsEntries.next();
+            int psExit_pos = 1;
+            psExit.setDate      (psExit_pos++, java.sql.Date.valueOf(entryQuotesCall.quote_date));
+            psExit.setDate      (psExit_pos++, java.sql.Date.valueOf(entryQuotesPut.quote_date));
 
-                if (!rsMore) {
+            psExit.setString    (psExit_pos++, entryQuotesCall.underlying_symbol);
+            // psExit.setString    (psExit_pos++, entryQuotesCall.root);
+            psExit.setDate      (psExit_pos++, java.sql.Date.valueOf(entryQuotesCall.expiration));
+            psExit.setFloat     (psExit_pos++, entryQuotesCall.strike);
+            psExit.setString    (psExit_pos++, entryQuotesCall.option_type);
 
-                    break;
-                    //throw new IllegalTradeException("not enough matches in query results");
-                }
+            psExit.setString    (psExit_pos++, entryQuotesPut.underlying_symbol);
+            // psExit.setString    (psExit_pos++, entryQuotesPut.root);
+            psExit.setDate      (psExit_pos++, java.sql.Date.valueOf(entryQuotesPut.expiration));
+            psExit.setFloat     (psExit_pos++, entryQuotesPut.strike);
+            psExit.setString    (psExit_pos++, entryQuotesPut.option_type);
 
-                Quote entryQuotesPut = DBQuoteController.quoteLoad(null, rsEntries);
-                if (!entryQuotesPut.option_type.equals("P")) {
-                    
-                    continue;
-                    // throw new IllegalTradeException("matching put not found for call");
-                }
+            if (tstrat.exitDTE != null)
+                psExit.setInt(psExit_pos++, tstrat.exitDTE);
 
-                if (!entryQuotesCall.quote_date.equals(entryQuotesPut.quote_date)) {
-                    throw new IllegalTradeException("call and put quote_date do not match");
-                }
-                
-                if (!entryQuotesCall.expiration.equals(entryQuotesPut.expiration)) {
-                    throw new IllegalTradeException("call and put expiration do not match");
-                }
+            if (tstrat.exitPercentLoss != null) {
+                psExit.setInt   (psExit_pos++, tstrat.quantityCall);
+                psExit.setInt   (psExit_pos++, tstrat.quantityPut);
+                psExit.setFloat (psExit_pos++, tstrat.exitPercentLoss   * (tstrat.quantityCall * entryQuotesCall.mid_1545 + tstrat.quantityPut * entryQuotesPut.mid_1545));
+            }
 
-                if (!entryQuotesCall.underlying_symbol.equals(entryQuotesPut.underlying_symbol)) {
-                    throw new IllegalTradeException("call and put underlying_symbol do not match");
-                }                
+            if (tstrat.exitPercentProfit != null) {
+                psExit.setInt   (psExit_pos++, tstrat.quantityCall);
+                psExit.setInt   (psExit_pos++, tstrat.quantityPut);                    
+                psExit.setFloat (psExit_pos++, tstrat.exitPercentProfit  * (tstrat.quantityCall * entryQuotesCall.mid_1545 + tstrat.quantityPut * entryQuotesPut.mid_1545));
+            }
 
-                quoteMap.put(entryQuotesCall.idquotes, entryQuotesCall);
-                quoteMap.put(entryQuotesPut.idquotes, entryQuotesPut);
+            ResultSet rsExit = psExit.executeQuery();
 
-                String sql = "SELECT" 
-                // debugging fields start
-                // +   " DATEDIFF(`quotesCall`.`expiration`, `quotesCall`.`quote_date`) AS strangle_dte,"
-                // +   " (? * (`quotesCall`.`bid_1545` + `quotesCall`.`ask_1545`) / 2) + (? * (`quotesPut`.`bid_1545` + `quotesPut`.`ask_1545`) / 2) AS strangle_value,"
-                // debugging fields end
-                +   " " + DBQuoteController.quoteColumns("quotesCall") + ", " + DBQuoteController.quoteColumns("quotesPut") 
-                +   " FROM quotes AS quotesCall, quotes AS quotesPut"
-                +   " WHERE `quotesCall`.`quote_date` = `quotesPut`.`quote_date`"
-                +       " AND `quotesCall`.`quote_date` > ? AND `quotesPut`.`quote_date` > ?"
+            if (!rsExit.next()) {
 
-                +       " AND `quotesCall`.`underlying_symbol` = ?"
-                +       " AND `quotesCall`.`root`              = ?"
-                +       " AND `quotesCall`.`expiration`        = ?"
-                +       " AND `quotesCall`.`strike`            = ?"
-                +       " AND `quotesCall`.`option_type`       = ?"
+                rsExit.close(); psEntry.close(); psExit.close(); c.close();
+                throw new QuoteNotFoundException("could not find trade exit");
+            }
 
-                +       " AND `quotesPut`.`underlying_symbol` = ?"                
-                +       " AND `quotesPut`.`root`              = ?"
-                +       " AND `quotesPut`.`expiration`        = ?"
-                +       " AND `quotesPut`.`strike`            = ?"
-                +       " AND `quotesPut`.`option_type`       = ?";
-                
-                if (tstrat.exitDTE == null && tstrat.exitPercentLoss == null && tstrat.exitPercentProfit == null) {
-                    // hold to expiry... the data actually might not be too good for this case as you are simulating
-                    // selling at 15 minutes before close
-                    sql += " ORDER BY quotesCall.quote_date DESC LIMIT 1";
-                } else {
-                    String sqlSub = "";
+            Quote exitQuotesCall    = DBQuoteController.quoteLoad("quotesCall", rsExit);
+            Quote exitQuotesPut     = DBQuoteController.quoteLoad("quotesPut",  rsExit);
 
-                    sqlSub +=   !sqlSub.isEmpty() ? " OR " : "";
-                    sqlSub +=   tstrat.exitDTE != null           ? "DATEDIFF(`quotesCall`.`expiration`, `quotesCall`.`quote_date`) < ?" : "";
-                    sqlSub +=   !sqlSub.isEmpty() ? " OR " : "";
-                    sqlSub +=   tstrat.exitPercentLoss != null   ? "(? * ((`quotesCall`.`bid_1545` + `quotesCall`.`ask_1545`) / 2)) + (? * ((`quotesPut`.`bid_1545` + `quotesPut`.`ask_1545`) / 2)) < ?" : "";
-                    sqlSub +=   !sqlSub.isEmpty() ? " OR " : "";
-                    sqlSub +=   tstrat.exitPercentProfit != null ? "(? * ((`quotesCall`.`bid_1545` + `quotesCall`.`ask_1545`) / 2)) + (? * ((`quotesPut`.`bid_1545` + `quotesPut`.`ask_1545`) / 2)) > ?" : "";
+            quoteMap.put(exitQuotesCall.idquotes, exitQuotesCall);
+            quoteMap.put(exitQuotesPut.idquotes, exitQuotesPut);
 
-                    sql += "AND (" + sqlSub + ") ORDER BY quotesCall.quote_date LIMIT 1";
-                }
+            Trade t = new Trade();
 
-                int ps_pos = 1;
+            t.entry_legA_idquotes = entryQuotesCall.idquotes;
+            t.entry_legA_quantity = tstrat.quantityCall;
+            t.entry_legB_idquotes = entryQuotesPut.idquotes;
+            t.entry_legB_quantity = tstrat.quantityPut;
 
-                PreparedStatement ps = c.prepareStatement(sql); 
+            t.exit_legA_idquotes = exitQuotesCall.idquotes;
+            t.exit_legA_quantity = tstrat.quantityCall * -1;
+            t.exit_legB_idquotes = exitQuotesPut.idquotes;
+            t.exit_legB_quantity = tstrat.quantityPut * -1;                
 
-                // ps.setInt       (ps_pos++, tstrat.quantityCall);
-                // ps.setInt       (ps_pos++, tstrat.quantityPut);
+            // this printout should be moved to some reporting controller... or something
 
-                ps.setDate      (ps_pos++, java.sql.Date.valueOf(entryQuotesCall.quote_date));
-                ps.setDate      (ps_pos++, java.sql.Date.valueOf(entryQuotesPut.quote_date));
-
-                ps.setString    (ps_pos++, entryQuotesCall.underlying_symbol);
-                ps.setString    (ps_pos++, entryQuotesCall.root);
-                ps.setDate      (ps_pos++, java.sql.Date.valueOf(entryQuotesCall.expiration));
-                ps.setFloat     (ps_pos++, entryQuotesCall.strike);
-                ps.setString    (ps_pos++, entryQuotesCall.option_type);
-
-                ps.setString    (ps_pos++, entryQuotesPut.underlying_symbol);
-                ps.setString    (ps_pos++, entryQuotesPut.root);
-                ps.setDate      (ps_pos++, java.sql.Date.valueOf(entryQuotesPut.expiration));
-                ps.setFloat     (ps_pos++, entryQuotesPut.strike);
-                ps.setString    (ps_pos++, entryQuotesPut.option_type);
-
-                if (tstrat.exitDTE != null)
-                    ps.setInt(ps_pos++, tstrat.exitDTE);
-
-                if (tstrat.exitPercentLoss != null) {
-                    ps.setInt   (ps_pos++, tstrat.quantityCall);
-                    ps.setInt   (ps_pos++, tstrat.quantityPut);
-                    ps.setFloat (ps_pos++, tstrat.exitPercentLoss   * (tstrat.quantityCall * entryQuotesCall.mid_1545 + tstrat.quantityPut * entryQuotesPut.mid_1545));
-                }
-
-                if (tstrat.exitPercentProfit != null) {
-                    ps.setInt   (ps_pos++, tstrat.quantityCall);
-                    ps.setInt   (ps_pos++, tstrat.quantityPut);                    
-                    ps.setFloat (ps_pos++, tstrat.exitPercentProfit  * (tstrat.quantityCall * entryQuotesCall.mid_1545 + tstrat.quantityPut * entryQuotesPut.mid_1545));
-                }
-
-                // System.out.println(ps.toString());
-
-                ResultSet rs = ps.executeQuery();
-    
-                if (!rs.next()) {
-                    
-                    rs.close(); ps.close(); c.close();
-                    throw new QuoteNotFoundException("could not find trade exit");
-                }
-
-                // Integer strangle_dte = rs.getInt("strangle_dte");
-                // Float strangle_value = rs.getFloat("strangle_value");
-
-                Quote exitQuotesCall = DBQuoteController.quoteLoad("quotesCall", rs);
-                Quote exitQuotesPut = DBQuoteController.quoteLoad("quotesPut", rs);
-
-                quoteMap.put(exitQuotesCall.idquotes, exitQuotesCall);
-                quoteMap.put(exitQuotesPut.idquotes, exitQuotesPut);
-
-                rs.close(); ps.close(); // c.close();
-
-                Trade t = new Trade();
-
-                t.entry_legA_idquotes = entryQuotesCall.idquotes;
-                t.entry_legA_quantity = tstrat.quantityCall;
-                t.entry_legB_idquotes = entryQuotesPut.idquotes;
-                t.entry_legB_quantity = tstrat.quantityPut;
-
-                t.exit_legA_idquotes = exitQuotesCall.idquotes;
-                t.exit_legA_quantity = tstrat.quantityCall * -1;
-                t.exit_legB_idquotes = exitQuotesPut.idquotes;
-                t.exit_legB_quantity = tstrat.quantityPut * -1;                
-
-                // Quantity Expiration Strike Option_Type Delta Cost
-
+            if (true) {
                 System.out.println("********************************************************************************************");
 
                 float open  = 0;
@@ -336,22 +364,29 @@ public class StrangleController implements ITradeStratController {
                 (close - open) * 100 / Math.abs(open)));
 
                 String reason = "unknown";
-                if (tstrat.exitDTE != null && (exitQuotesPut.dte < tstrat.exitDTE || exitQuotesPut.dte < tstrat.exitDTE))
-                    reason = "< " + tstrat.exitDTE + "DTE";
-                else if (tstrat.exitPercentLoss != null && (close < tstrat.exitPercentLoss * open))
+                if (tstrat.exitDTE != null && exitQuotesPut.dte <= tstrat.exitDTE)
+                    reason = "<= " + tstrat.exitDTE + "DTE";
+                else if (tstrat.exitPercentLoss != null && close < tstrat.exitPercentLoss * open)
                     reason = String.format("stop loss %12.02f%% hit", tstrat.exitPercentLoss * 100.f);
-                else if (tstrat.exitPercentProfit != null && (close > tstrat.exitPercentProfit * open))
+                else if (tstrat.exitPercentProfit != null && close > tstrat.exitPercentProfit * open)
                     reason = String.format("take profit %12.02f%% hit", tstrat.exitPercentProfit * 100.f);
 
                 System.out.println(String.format("Reason Closed: %s", reason));
-
-                TradeController.validateTrade(t, quoteMap);
-                trades.add(t);
             }
 
-            rsEntries.close(); psEntries.close(); c.close();
+            TradeController.validateTrade(t, quoteMap);
+            trades.add(t);
+
+            rsExit.close(); // psExit.close(); // c.close();
         }
 
+        if (trades.size() <= 0) {
+            psEntry.close(); psExit.close(); c.close();
+            throw new QuoteNotFoundException("no trades generated");
+        }        
+
+        psEntry.close(); psExit.close(); c.close();
         return trades;
     }
+
 }
