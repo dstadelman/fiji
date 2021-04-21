@@ -69,15 +69,14 @@ public class DBQuoteController extends DBController {
 
         String sql = "SELECT " + DBQuoteController.quoteColumns(null)
             + " FROM quotes"
-            // + " WHERE underlying_symbol = ? AND root = ? AND quote_date = ? AND strike = ? AND option_type = ? LIMIT 1";
-            + " WHERE underlying_symbol = ? AND quote_date = ? AND strike = ? AND option_type = ? LIMIT 1";
+            + " WHERE quote_date = ? AND underlying_symbol = ? AND expiration = ? AND strike = ? AND option_type = ? LIMIT 1";
 
         int ps_pos = 1;
 
         PreparedStatement ps = c.prepareStatement(sql); 
-        ps.setString    (ps_pos++, entry.underlying_symbol);
-        // ps.setString    (ps_pos++, entry.root);
         ps.setDate      (ps_pos++, java.sql.Date.valueOf(currDate));
+        ps.setString    (ps_pos++, entry.underlying_symbol);
+        ps.setDate      (ps_pos++, java.sql.Date.valueOf(entry.expiration));
         ps.setFloat     (ps_pos++, entry.strike);
         ps.setString    (ps_pos++, entry.option_type);
         ResultSet rs = ps.executeQuery();
@@ -100,15 +99,13 @@ public class DBQuoteController extends DBController {
 
         String sql = "SELECT " + DBQuoteController.quoteColumns(null)
             + " FROM quotes"
-            // + " WHERE underlying_symbol = ? AND root = ? AND quote_date = ? LIMIT 1";
-            + " WHERE underlying_symbol = ? AND quote_date = ? LIMIT 1";
+            + " WHERE quote_date = ? AND underlying_symbol = ? LIMIT 1";
 
         int ps_pos = 1;
 
         PreparedStatement ps = c.prepareStatement(sql); 
-        ps.setString    (ps_pos++, entry.underlying_symbol);
-        // ps.setString    (ps_pos++, entry.root);
         ps.setDate      (ps_pos++, java.sql.Date.valueOf(currDate));
+        ps.setString    (ps_pos++, entry.underlying_symbol);
         ResultSet rs = ps.executeQuery();
 
         while (rs.next())
@@ -229,7 +226,7 @@ public class DBQuoteController extends DBController {
 
     public static float valueMid1545_leg(Quote leg, int leg_quantity) {
         if (leg != null) 
-            return leg.mid_1545 * leg_quantity;
+            return leg.mid_1545 * leg_quantity * 100;
         return 0;
     }
 
@@ -237,6 +234,29 @@ public class DBQuoteController extends DBController {
         if (outright != null) 
             return outright.underlying_mid_1545 * outright_quantity;
         return 0;
+    }
+
+    public static Integer getDeltaBinned(Float delta, Connection c) throws SQLException, QuoteNotFoundException {
+
+        if (delta == null)
+            return null;
+
+        String sql = "SELECT ROUND((?) * 20) * 5 AS delta_binned";
+
+        int ps_pos = 1;
+        PreparedStatement ps = c.prepareStatement(sql); 
+        ps.setFloat     (ps_pos++, delta);
+        ResultSet rs = ps.executeQuery();
+
+        if (!rs.next()) {
+            throw new QuoteNotFoundException(String.format("could not build binned delta for %f", delta));
+        }
+
+        Integer delta_binned = rs.getInt("delta_binned");
+
+        rs.close(); ps.close(); // c.close();
+
+        return delta_binned;
     }
 
 }

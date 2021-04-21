@@ -12,14 +12,15 @@ import com.github.dstadelman.fiji.controllers.TradeController;
 import com.github.dstadelman.fiji.models.PortfolioTrade;
 import com.github.dstadelman.fiji.models.QuoteMap;
 import com.github.dstadelman.fiji.models.Trade;
+import com.github.dstadelman.fiji.models.portfoliostrats.NLot;
 import com.github.dstadelman.fiji.models.portfoliostrats.PercentAllocation;
 
-public class PercentAllocationController implements IPortfolioStratController {
+public class NLotController implements IPortfolioStratController {
 
-    public PercentAllocation percentAllocation;
+    public NLot nLot;
 
-    public PercentAllocationController(PercentAllocation fullAllocation) {
-        this.percentAllocation = fullAllocation;
+    public NLotController(NLot nlot) {
+        this.nLot = nlot;
     }
 
     @Override
@@ -27,32 +28,32 @@ public class PercentAllocationController implements IPortfolioStratController {
 
         // float net_liq   = percentAllocation.initial_capital;
         // cash is also net_liq in this case
-        float cash = percentAllocation.initial_capital;
+        // float cash = percentAllocation.initial_capital;
 
         List<PortfolioTrade> portfolioTrades = new ArrayList<PortfolioTrade>();
 
-        LocalDate lastExit = null;
+        // LocalDate lastExit = null;
 
         for (int i = 0; i < trades.size(); i++) {
 
             Trade t = trades.get(i);
 
-            if (cash < 0 || (lastExit != null && lastExit.isAfter(TradeController.dateOfEarliestEntry(t, quoteMap)))) {
-                continue;
-            }
+            // if (cash < 0 || (lastExit != null && lastExit.isAfter(TradeController.dateOfEarliestEntry(t, quoteMap)))) {
+            //     continue;
+            // }
 
             LocalDate dateEntry = TradeController.dateOfEarliestEntry(t, quoteMap);
             LocalDate dateExit = TradeController.dateOfLatestExit(t, quoteMap);
-            lastExit = dateExit;
+            // lastExit = dateExit;
 
-            int m = (int) ((cash * percentAllocation.percent_allocation) / TradeController.marginReq(t, quoteMap, percentAllocation.margin_requirement_options, percentAllocation.outright_leverage));
+            // int m = (int) ((cash * percentAllocation.percent_allocation) / TradeController.marginReq(t, quoteMap, percentAllocation.margin_requirement_options, percentAllocation.outright_leverage));
             
-            float entryOne  = TradeController.tradeValueEntry(t, quoteMap);
-            float exitOne   = TradeController.tradeValueExit(t, quoteMap);
+            // float entryOne  = TradeController.tradeValueEntry(t, quoteMap);
+            // float exitOne   = TradeController.tradeValueExit(t, quoteMap);
 
-            cash += m * (exitOne - entryOne);
+            // cash += m * (exitOne - entryOne);
 
-            portfolioTrades.add(new PortfolioTrade(t, m, dateEntry, dateExit));
+            portfolioTrades.add(new PortfolioTrade(t, nLot.nlots, dateEntry, dateExit));
         }
 
         return portfolioTrades;

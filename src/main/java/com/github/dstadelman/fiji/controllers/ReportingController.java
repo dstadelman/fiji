@@ -41,7 +41,7 @@ public class ReportingController {
                 seriesStart = pt.dateEntry;
             }
 
-            if (seriesEnd == null || pt.dateExit.isBefore(seriesEnd)) {
+            if (seriesEnd == null || pt.dateExit.isAfter(seriesEnd)) {
                 seriesEnd = pt.dateExit;
             }            
         }
@@ -55,6 +55,13 @@ public class ReportingController {
         TimeSeries s = new TimeSeries(tstrat.getDescription() + " / " + pstrat.getDescription());
 
         float cash = initial_capital;
+
+        boolean print = false;
+
+        if (print) {
+            System.out.println("*******************************************************************");
+            System.out.println("Date, Cash Change, Cash, Assets Held, Net Liq");
+        }
 
         for (int i = 0; i < dates.size(); i++) {
 
@@ -80,7 +87,8 @@ public class ReportingController {
 
             pt_in_force.stream().map(pt -> {
                 try {
-                    return TradeController.tradeValueOnDate(pt, currDate, quoteMap);
+                    TradeValueOnDate v = TradeController.tradeValueOnDate(pt, currDate, quoteMap);
+                    return v;
                 } catch (QuoteNotFoundException | SQLException | IllegalTradeException e) {
                     throw new RuntimeException(e);
                 }
@@ -90,17 +98,21 @@ public class ReportingController {
             })
             .forEach(tradeValueOnDate -> {
                 totals.dataPresent  = true;
-                totals.cashDelta    += tradeValueOnDate.cashDelta;
-                totals.assetLiq     += tradeValueOnDate.assetLiq;
+                totals.cashChange += tradeValueOnDate.cashChange;
+                totals.assetValue += tradeValueOnDate.assetValue;
             });
 
             if (!totals.dataPresent) {
                 continue;
             }
 
-            cash += totals.cashDelta;
+            cash += totals.cashChange;
 
-            s.add(new Day(currDate.getDayOfMonth(), currDate.getMonthValue(), currDate.getYear()), cash + totals.assetLiq);
+            if (print) {
+                System.out.println(String.format("%s, %.02f, %.02f, %.02f, %.02f", currDate, totals.cashChange, cash, totals.assetValue, cash + totals.assetValue));
+            }
+
+            s.add(new Day(currDate.getDayOfMonth(), currDate.getMonthValue(), currDate.getYear()), cash + totals.assetValue);
         }
 
         return s;

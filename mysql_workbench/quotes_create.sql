@@ -36,5 +36,14 @@ CREATE TABLE `quotes` (
   `vwap` float NOT NULL,
   `open_interest` int NOT NULL,
   `delivery_code` varchar(64) DEFAULT NULL,
+  `mid_1545` float GENERATED ALWAYS AS (((`bid_1545` + `ask_1545`) / 2)) STORED,
+  `underlying_mid_1545` float GENERATED ALWAYS AS (((`underlying_bid_1545` + `underlying_ask_1545`) / 2)) STORED,
+  `mid_eod` float GENERATED ALWAYS AS (((`bid_eod` + `ask_eod`) / 2)) STORED,
+  `underlying_mid_eod` float GENERATED ALWAYS AS (((`underlying_bid_eod` + `underlying_ask_eod`) / 2)) STORED,
+  `dte` int GENERATED ALWAYS AS ((to_days(`expiration`) - to_days(`quote_date`))) STORED,
+  `delta_binned_1545` int GENERATED ALWAYS AS ((round((`delta_1545` * 20),0) * 5)) STORED,
   PRIMARY KEY (`idquotes`),
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `idx_quotes_underlying_symbol_quote_date` (`underlying_symbol`,`quote_date`),
+  KEY `idx_quotes_underlying_symbol_expiration` (`underlying_symbol`,`expiration`),
+  KEY `idx_quotes_underlying_symbol_quote_date_delta_binned_1545_dte` (`underlying_symbol`,`quote_date`,`delta_binned_1545`,`dte`)
+) ENGINE=InnoDB AUTO_INCREMENT=14034289 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

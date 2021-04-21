@@ -72,13 +72,13 @@ public class TradeController {
     public static class TradeValueOnDate {
 
         public boolean dataPresent;
-        public float cashDelta;     // for trade entry and exit
-        public float assetLiq; // for value of the trade right noe
+        public float cashChange;     // for trade entry and exit
+        public float assetValue; // for value of the trade right noe
 
         public TradeValueOnDate() {
             dataPresent = false;
-            cashDelta = 0;
-            assetLiq = 0;
+            cashChange = 0;
+            assetValue = 0;
         }
     }
 
@@ -262,21 +262,19 @@ public class TradeController {
             }
 
             if (currDate.equals(entry.quote_date)) {
-                // opening the outright
 
                 float one = DBQuoteController.valueMid1545_leg(entry, entry_leg_quantity);
 
                 v.dataPresent = true;
-                v.cashDelta -= one;
-                v.assetLiq += one;
+                v.cashChange -= one;
+                v.assetValue += one;
             }
             else if (currDate.equals(exit.quote_date)) {
-                // closing the outright
 
                 float one = DBQuoteController.valueMid1545_leg(exit, exit_leg_quantity);
 
                 v.dataPresent = true;
-                v.cashDelta -= one;
+                v.cashChange -= one;
                 // v.assetLiq -= one;
             }
             else {
@@ -289,7 +287,7 @@ public class TradeController {
 
                     v.dataPresent = true;
                     // v.cashDelta -= one;
-                    v.assetLiq += one;
+                    v.assetValue += one;
                 }
             }
         }
@@ -323,8 +321,8 @@ public class TradeController {
                 float one = DBQuoteController.valueMid1545_outright(entry, pt.trade.entry_outright_quantity);
 
                 v.dataPresent = true;
-                v.cashDelta -= one;
-                v.assetLiq += one;
+                v.cashChange -= one;
+                v.assetValue += one;
             }
             else if (currDate.equals(exit.quote_date)) {
                 // closing the outright
@@ -332,7 +330,7 @@ public class TradeController {
                 float one = DBQuoteController.valueMid1545_outright(exit, pt.trade.exit_outright_quantity);
 
                 v.dataPresent = true;
-                v.cashDelta -= one;
+                v.cashChange -= one;
                 // v.assetLiq -= one;
             }
             else {
@@ -345,7 +343,7 @@ public class TradeController {
 
                     v.dataPresent = true;
                     // v.cashDelta -= one;
-                    v.assetLiq += one;
+                    v.assetValue += one;
                 }
             }
         }
@@ -353,35 +351,33 @@ public class TradeController {
         TradeValueOnDate vLegA = pt.trade.entry_legA_idquotes == null ? null : tradeValueOnDate_leg(pt.trade.entry_legA_idquotes, pt.trade.entry_legA_quantity, pt.trade.exit_legA_idquotes, pt.trade.exit_legA_quantity, quoteMap, currDate);
         if (vLegA != null && vLegA.dataPresent) {
             v.dataPresent = true;
-            v.cashDelta += vLegA.cashDelta;
-            v.assetLiq += vLegA.assetLiq;
+            v.cashChange += vLegA.cashChange;
+            v.assetValue += vLegA.assetValue;
         }
 
         TradeValueOnDate vLegB = pt.trade.entry_legB_idquotes == null ? null : tradeValueOnDate_leg(pt.trade.entry_legB_idquotes, pt.trade.entry_legB_quantity, pt.trade.exit_legB_idquotes, pt.trade.exit_legB_quantity, quoteMap, currDate);
         if (vLegB != null && vLegB.dataPresent) {
             v.dataPresent = true;
-            v.cashDelta += vLegB.cashDelta;
-            v.assetLiq += vLegB.assetLiq;
+            v.cashChange += vLegB.cashChange;
+            v.assetValue += vLegB.assetValue;
         }        
 
         TradeValueOnDate vLegC = pt.trade.entry_legC_idquotes == null ? null : tradeValueOnDate_leg(pt.trade.entry_legC_idquotes, pt.trade.entry_legC_quantity, pt.trade.exit_legC_idquotes, pt.trade.exit_legC_quantity, quoteMap, currDate);
         if (vLegC != null && vLegC.dataPresent) {
             v.dataPresent = true;
-            v.cashDelta += vLegC.cashDelta;
-            v.assetLiq += vLegC.assetLiq;
+            v.cashChange += vLegC.cashChange;
+            v.assetValue += vLegC.assetValue;
         }
         
         TradeValueOnDate vLegD = pt.trade.entry_legD_idquotes == null ? null : tradeValueOnDate_leg(pt.trade.entry_legD_idquotes, pt.trade.entry_legD_quantity, pt.trade.exit_legD_idquotes, pt.trade.exit_legD_quantity, quoteMap, currDate);
         if (vLegD != null && vLegD.dataPresent) {
             v.dataPresent = true;
-            v.cashDelta += vLegD.cashDelta;
-            v.assetLiq += vLegD.assetLiq;
+            v.cashChange += vLegD.cashChange;
+            v.assetValue += vLegD.assetValue;
         }
 
-        if (v.dataPresent) {
-            v.cashDelta *= pt.quantity;
-            v.assetLiq *= pt.quantity;
-        }
+        v.cashChange *= pt.quantity;
+        v.assetValue *= pt.quantity;
 
         return v;
     }    

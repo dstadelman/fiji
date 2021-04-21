@@ -1,6 +1,9 @@
 package com.github.dstadelman.fiji.views;
 
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.swing.JFrame;
 
 import org.jfree.chart.ChartColor;
@@ -15,12 +18,16 @@ import org.jfree.data.xy.XYDataset;
 public class QuickChartFrame extends JFrame {
     
     public QuickChartFrame(String title, TimeSeries ... series) {
+        this(title, Arrays.asList(series));
+    }
+
+    public QuickChartFrame(String title, List<TimeSeries> series) {
         super(title);
         
         TimeSeriesCollection dataset = new TimeSeriesCollection();
 
-        for (int i = 0; i < series.length; i++) {
-            dataset.addSeries(series[0]);
+        for (int i = 0; i < series.size(); i++) {
+            dataset.addSeries(series.get(i));
         }
 
         JFreeChart chart = ChartFactory.createTimeSeriesChart(title, "Date", "Net. Liq.", dataset);
@@ -30,8 +37,7 @@ public class QuickChartFrame extends JFrame {
         plot.setBackgroundPaint(new ChartColor(255,228,196));
         
         ChartPanel panel = new ChartPanel(chart);
-        setContentPane(panel);
+        setContentPane(panel);        
     }
-
-
+    
 }
