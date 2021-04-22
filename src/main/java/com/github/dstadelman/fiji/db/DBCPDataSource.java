@@ -30,16 +30,16 @@ public class DBCPDataSource {
             Properties appProps = new Properties();
             appProps.load(new FileInputStream(appConfigPath));
             
-            String mysqlURL = appProps.getProperty("mysql-url");
-            String mysqlUser = appProps.getProperty("mysql-user");
-            String mysqlPass = appProps.getProperty("mysql-pass");
+            String mysqlURL = appProps.getProperty("pgsql-url");
+            String mysqlUser = appProps.getProperty("pgsql-user");
+            String mysqlPass = appProps.getProperty("pgsql-pass");
 
             if (mysqlURL == null || mysqlURL.isEmpty())
-                throw new Exception("app.properties missing mysql-url");
+                throw new Exception("app.properties missing pgsql-url");
             if (mysqlUser == null || mysqlUser.isEmpty())
-                throw new Exception("app.properties missing mysql-user");
+                throw new Exception("app.properties missing pgsql-user");
             if (mysqlPass == null || mysqlPass.isEmpty())
-                throw new Exception("app.properties missing mysql-pass");
+                throw new Exception("app.properties missing pgsql-pass");
 
             // ds.setUrl(mysqlURL);
             // ds.setUsername(mysqlUser);

@@ -4,7 +4,7 @@ if [ $# -lt 3 ]; then
     echo "$0 <BASH_PATH> <WINDOWS_PATH>" 
     echo ""
     echo "EXAMPLE: "
-    echo "./quotes_import_csv.sh quotes /e/MyProjects/Cboe/ E:\\MyProjects\\Cboe\\"
+    echo "./quotes_import_csv.sh quotes /e/MyProjects/Cboe/RUT_2004-01_2021-01/ E:\\\\MyProjects\\\\Cboe\\\\RUT_2004-01_2021-01\\\\"
     exit 0
 fi
 
@@ -19,12 +19,8 @@ cd ${CSV_PATH_BASH}
 for f in `ls *.csv`; do
 
     echo """
-LOAD DATA INFILE '${CSV_PATH_WINDOWS}$f' 
-INTO TABLE ${TABLE_NAME}
-FIELDS TERMINATED BY ',' ENCLOSED BY '\"'
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES (
-underlying_symbol,
+
+COPY ${TABLE_NAME}(underlying_symbol,
 quote_date,
 root,
 expiration,
@@ -57,7 +53,10 @@ underlying_bid_eod,
 underlying_ask_eod,
 vwap,
 open_interest,
-delivery_code);
+delivery_code)
+FROM '${CSV_PATH_WINDOWS}$f'
+DELIMITER ','
+CSV HEADER;
 
 """
 

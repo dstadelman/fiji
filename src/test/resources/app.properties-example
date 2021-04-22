@@ -1,5 +1,5 @@
 
 
-mysql-url=jdbc:mysql://localhost:3306/fiji
-mysql-user=root
-mysql-pass=!password here!
+pgsql-url=jdbc:postgresql://localhost:3306/fiji
+pgsql-user=root
+pgsql-pass=!password here!
