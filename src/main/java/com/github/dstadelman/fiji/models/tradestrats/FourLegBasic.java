@@ -80,10 +80,10 @@ public class FourLegBasic implements IDescription {
     @Override
     public String getDescription() {
         return underlying_symbol + ": " + name + " ("
-        +   (deltaA != null && quantityA != null && quantityA != 0 ? String.format("%d @ Δ:%.02f ", quantityA, deltaA) : "")
-        +   (deltaB != null && quantityB != null && quantityB != 0 ? String.format("%d @ Δ:%.02f ", quantityB, deltaB) : "")
-        +   (deltaC != null && quantityC != null && quantityC != 0 ? String.format("%d @ Δ:%.02f ", quantityC, deltaC) : "")
-        +   (deltaD != null && quantityD != null && quantityD != 0 ? String.format("%d @ Δ:%.02f ", quantityD, deltaD) : "")
+        +   (deltaA != null && quantityA != null && quantityA != 0 ? String.format("%d @ %.02fΔ ", quantityA, deltaA) : "")
+        +   (deltaB != null && quantityB != null && quantityB != 0 ? String.format("%d @ %.02fΔ ", quantityB, deltaB) : "")
+        +   (deltaC != null && quantityC != null && quantityC != 0 ? String.format("%d @ %.02fΔ ", quantityC, deltaC) : "")
+        +   (deltaD != null && quantityD != null && quantityD != 0 ? String.format("%d @ %.02fΔ ", quantityD, deltaD) : "")
         +   (entryDTE != null && entryDTE > 0 ? String.format(", %d-", entryDTE) : "E")
         +   (exitDTE != null && exitDTE > 0 ? String.format("%d", exitDTE) : "0") + " DTE"
         +   (exitPercentProfit != null ? String.format(", %.02f%% profit", exitPercentProfit * 100) : "")
