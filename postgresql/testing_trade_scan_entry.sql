@@ -32,7 +32,7 @@ SELECT idquotes, quote_date, root, expiration, strike, active_underlying_price_1
 		, ABS(delta_1545 - .3)
 	) AS expiration_rank_delta_high
 	FROM quotes
-	WHERE `expiration` > DATE_ADD("2004-01-08", INTERVAL 45 DAY) 
+	WHERE expiration > DATE_ADD("2004-01-08", INTERVAL 45 DAY) 
 		AND expiration < "2021-01-15"
 		AND DATEDIFF(expiration, quote_date) > 35
         AND DATEDIFF(expiration, quote_date) < 55

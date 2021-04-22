@@ -74,7 +74,7 @@ public class FourLegBasicController implements ITradeStratController {
 
         {
             // first quote_date
-            String sql = "SELECT " + DBQuoteController.quoteColumns(null) + " FROM quotes WHERE `underlying_symbol` = ? ORDER BY `quote_date` LIMIT 1;";
+            String sql = "SELECT " + DBQuoteController.quoteColumns(null) + " FROM quotes WHERE underlying_symbol = ? ORDER BY quote_date LIMIT 1;";
 
             PreparedStatement ps = c.prepareStatement(sql); 
             ps.setString(1, tstrat.underlying_symbol);
@@ -94,7 +94,7 @@ public class FourLegBasicController implements ITradeStratController {
 
         {
             // last quote_date
-            String sql = "SELECT " + DBQuoteController.quoteColumns(null) + " FROM quotes WHERE `underlying_symbol` = ? ORDER BY `quote_date` DESC LIMIT 1;";
+            String sql = "SELECT " + DBQuoteController.quoteColumns(null) + " FROM quotes WHERE underlying_symbol = ? ORDER BY quote_date DESC LIMIT 1;";
 
             PreparedStatement ps = c.prepareStatement(sql); 
             ps.setString(1, tstrat.underlying_symbol);
@@ -116,13 +116,13 @@ public class FourLegBasicController implements ITradeStratController {
 
         {
             // last quote_date
-            String sql = "SELECT `expiration`"
+            String sql = "SELECT expiration"
             +   " FROM quotes"
-            +   " WHERE  `underlying_symbol` = ?"           // underlying_symbol
-            +       " AND `expiration` > ?"                 // first date of data + entryDTE + 10
-            +       " AND `expiration` < ?"                 // last date of data
-            +       " GROUP BY `expiration`"
-            +       " ORDER BY `expiration`";
+            +   " WHERE  underlying_symbol = ?"           // underlying_symbol
+            +       " AND expiration > ?"                 // first date of data + entryDTE + 10
+            +       " AND expiration < ?"                 // last date of data
+            +       " GROUP BY expiration"
+            +       " ORDER BY expiration";
 
             int ps_pos = 1;
             PreparedStatement ps = c.prepareStatement(sql); 
@@ -165,40 +165,40 @@ public class FourLegBasicController implements ITradeStratController {
 
         sqlEntry += " FROM ";
 
-        sqlSub += tstrat.deltaA == null ? "" : (sqlSub.isEmpty() ? "" : ", ") + "`quotes` AS `quotesA`";
-        sqlSub += tstrat.deltaB == null ? "" : (sqlSub.isEmpty() ? "" : ", ") + "`quotes` AS `quotesB`";
-        sqlSub += tstrat.deltaC == null ? "" : (sqlSub.isEmpty() ? "" : ", ") + "`quotes` AS `quotesC`";
-        sqlSub += tstrat.deltaD == null ? "" : (sqlSub.isEmpty() ? "" : ", ") + "`quotes` AS `quotesD`";
+        sqlSub += tstrat.deltaA == null ? "" : (sqlSub.isEmpty() ? "" : ", ") + "quotes AS quotesA";
+        sqlSub += tstrat.deltaB == null ? "" : (sqlSub.isEmpty() ? "" : ", ") + "quotes AS quotesB";
+        sqlSub += tstrat.deltaC == null ? "" : (sqlSub.isEmpty() ? "" : ", ") + "quotes AS quotesC";
+        sqlSub += tstrat.deltaD == null ? "" : (sqlSub.isEmpty() ? "" : ", ") + "quotes AS quotesD";
 
         sqlEntry += sqlSub; sqlSub = "";        
 
         sqlEntry += " WHERE ";
 
-        sqlSub += tstrat.deltaA == null ? "" : (sqlSub.isEmpty() ? "" : " AND ") + "`quotesA`.`underlying_symbol` = ?";
-        sqlSub += tstrat.deltaB == null ? "" : (sqlSub.isEmpty() ? "" : " AND ") + "`quotesB`.`underlying_symbol` = ?";
-        sqlSub += tstrat.deltaC == null ? "" : (sqlSub.isEmpty() ? "" : " AND ") + "`quotesC`.`underlying_symbol` = ?";
-        sqlSub += tstrat.deltaD == null ? "" : (sqlSub.isEmpty() ? "" : " AND ") + "`quotesD`.`underlying_symbol` = ?";
+        sqlSub += tstrat.deltaA == null ? "" : (sqlSub.isEmpty() ? "" : " AND ") + "quotesA.underlying_symbol = ?";
+        sqlSub += tstrat.deltaB == null ? "" : (sqlSub.isEmpty() ? "" : " AND ") + "quotesB.underlying_symbol = ?";
+        sqlSub += tstrat.deltaC == null ? "" : (sqlSub.isEmpty() ? "" : " AND ") + "quotesC.underlying_symbol = ?";
+        sqlSub += tstrat.deltaD == null ? "" : (sqlSub.isEmpty() ? "" : " AND ") + "quotesD.underlying_symbol = ?";
 
         sqlEntry += sqlSub; sqlSub = "";      
 
         {
             if (tstrat.deltaA != null && tstrat.deltaB != null) {
-                sqlEntry += " AND `quotesA`.`quote_date` = `quotesB`.`quote_date`";
+                sqlEntry += " AND quotesA.quote_date = quotesB.quote_date";
             }
             if (tstrat.deltaA != null && tstrat.deltaC != null) {
-                sqlEntry += " AND `quotesA`.`quote_date` = `quotesC`.`quote_date`";
+                sqlEntry += " AND quotesA.quote_date = quotesC.quote_date";
             }
             if (tstrat.deltaA != null && tstrat.deltaD != null) {
-                sqlEntry += " AND `quotesA`.`quote_date` = `quotesD`.`quote_date`";
+                sqlEntry += " AND quotesA.quote_date = quotesD.quote_date";
             }
             if (tstrat.deltaB != null && tstrat.deltaC != null) {
-                sqlEntry += " AND `quotesB`.`quote_date` = `quotesC`.`quote_date`";
+                sqlEntry += " AND quotesB.quote_date = quotesC.quote_date";
             }
             if (tstrat.deltaB != null && tstrat.deltaD != null) {
-                sqlEntry += " AND `quotesB`.`quote_date` = `quotesD`.`quote_date`";
+                sqlEntry += " AND quotesB.quote_date = quotesD.quote_date";
             }            
             if (tstrat.deltaC != null && tstrat.deltaD != null) {
-                sqlEntry += " AND `quotesC`.`quote_date` = `quotesD`.`quote_date`";
+                sqlEntry += " AND quotesC.quote_date = quotesD.quote_date";
             }                        
         }
 
@@ -207,27 +207,27 @@ public class FourLegBasicController implements ITradeStratController {
         String sqlExit = sqlEntry;        
         // ********************************************************************
 
-        sqlEntry += tstrat.deltaA == null ? "" : " AND `quotesA`.`expiration` = ?";
-        sqlEntry += tstrat.deltaB == null ? "" : " AND `quotesB`.`expiration` = ?";
-        sqlEntry += tstrat.deltaC == null ? "" : " AND `quotesC`.`expiration` = ?";
-        sqlEntry += tstrat.deltaD == null ? "" : " AND `quotesD`.`expiration` = ?";
+        sqlEntry += tstrat.deltaA == null ? "" : " AND quotesA.expiration = ?";
+        sqlEntry += tstrat.deltaB == null ? "" : " AND quotesB.expiration = ?";
+        sqlEntry += tstrat.deltaC == null ? "" : " AND quotesC.expiration = ?";
+        sqlEntry += tstrat.deltaD == null ? "" : " AND quotesD.expiration = ?";
 
         // what if there is no delta binned there? perhaps make a bigger bin?
-        sqlEntry += tstrat.deltaA == null ? "" : " AND `quotesA`.`delta_binned_1545` = ?";
-        sqlEntry += tstrat.deltaB == null ? "" : " AND `quotesB`.`delta_binned_1545` = ?";
-        sqlEntry += tstrat.deltaC == null ? "" : " AND `quotesC`.`delta_binned_1545` = ?";
-        sqlEntry += tstrat.deltaD == null ? "" : " AND `quotesD`.`delta_binned_1545` = ?";
+        sqlEntry += tstrat.deltaA == null ? "" : " AND quotesA.delta_binned_1545 = ?";
+        sqlEntry += tstrat.deltaB == null ? "" : " AND quotesB.delta_binned_1545 = ?";
+        sqlEntry += tstrat.deltaC == null ? "" : " AND quotesC.delta_binned_1545 = ?";
+        sqlEntry += tstrat.deltaD == null ? "" : " AND quotesD.delta_binned_1545 = ?";
 
-        sqlEntry += tstrat.deltaA == null ? "" : " AND `quotesA`.`dte` - 5 < ? AND `quotesA`.`dte` + 5 > ?";
-        sqlEntry += tstrat.deltaB == null ? "" : " AND `quotesB`.`dte` - 5 < ? AND `quotesB`.`dte` + 5 > ?";
-        sqlEntry += tstrat.deltaC == null ? "" : " AND `quotesC`.`dte` - 5 < ? AND `quotesC`.`dte` + 5 > ?";
-        sqlEntry += tstrat.deltaD == null ? "" : " AND `quotesD`.`dte` - 5 < ? AND `quotesD`.`dte` + 5 > ?";
+        sqlEntry += tstrat.deltaA == null ? "" : " AND quotesA.dte - 5 < ? AND quotesA.dte + 5 > ?";
+        sqlEntry += tstrat.deltaB == null ? "" : " AND quotesB.dte - 5 < ? AND quotesB.dte + 5 > ?";
+        sqlEntry += tstrat.deltaC == null ? "" : " AND quotesC.dte - 5 < ? AND quotesC.dte + 5 > ?";
+        sqlEntry += tstrat.deltaD == null ? "" : " AND quotesD.dte - 5 < ? AND quotesD.dte + 5 > ?";
 
         sqlEntry += " ORDER BY ";
-        if      (tstrat.deltaA != null) sqlEntry += "ABS(`quotesA`.`dte` - ?)";
-        else if (tstrat.deltaB != null) sqlEntry += "ABS(`quotesB`.`dte` - ?)";
-        else if (tstrat.deltaC != null) sqlEntry += "ABS(`quotesC`.`dte` - ?)";
-        else if (tstrat.deltaD != null) sqlEntry += "ABS(`quotesD`.`dte` - ?)";
+        if      (tstrat.deltaA != null) sqlEntry += "ABS(quotesA.dte - ?)";
+        else if (tstrat.deltaB != null) sqlEntry += "ABS(quotesB.dte - ?)";
+        else if (tstrat.deltaC != null) sqlEntry += "ABS(quotesC.dte - ?)";
+        else if (tstrat.deltaD != null) sqlEntry += "ABS(quotesD.dte - ?)";
         sqlEntry += " LIMIT 1";
 
         PreparedStatement psEntry = c.prepareStatement(sqlEntry);         
@@ -235,54 +235,54 @@ public class FourLegBasicController implements ITradeStratController {
         // ********************************************************************
         // FINISH OFF EXIT QUERY
 
-        sqlExit += tstrat.deltaA == null ? "" : " AND `quotesA`.`quote_date` > ?";
-        sqlExit += tstrat.deltaB == null ? "" : " AND `quotesB`.`quote_date` > ?";
-        sqlExit += tstrat.deltaC == null ? "" : " AND `quotesC`.`quote_date` > ?";
-        sqlExit += tstrat.deltaD == null ? "" : " AND `quotesD`.`quote_date` > ?";
+        sqlExit += tstrat.deltaA == null ? "" : " AND quotesA.quote_date > ?";
+        sqlExit += tstrat.deltaB == null ? "" : " AND quotesB.quote_date > ?";
+        sqlExit += tstrat.deltaC == null ? "" : " AND quotesC.quote_date > ?";
+        sqlExit += tstrat.deltaD == null ? "" : " AND quotesD.quote_date > ?";
 
-        sqlExit += tstrat.deltaA == null ? "" : " AND `quotesA`.`expiration` = ?";
-        sqlExit += tstrat.deltaB == null ? "" : " AND `quotesB`.`expiration` = ?";
-        sqlExit += tstrat.deltaC == null ? "" : " AND `quotesC`.`expiration` = ?";
-        sqlExit += tstrat.deltaD == null ? "" : " AND `quotesD`.`expiration` = ?";
+        sqlExit += tstrat.deltaA == null ? "" : " AND quotesA.expiration = ?";
+        sqlExit += tstrat.deltaB == null ? "" : " AND quotesB.expiration = ?";
+        sqlExit += tstrat.deltaC == null ? "" : " AND quotesC.expiration = ?";
+        sqlExit += tstrat.deltaD == null ? "" : " AND quotesD.expiration = ?";
 
-        sqlExit += tstrat.deltaA == null ? "" : " AND `quotesA`.`strike` = ?";
-        sqlExit += tstrat.deltaB == null ? "" : " AND `quotesB`.`strike` = ?";
-        sqlExit += tstrat.deltaC == null ? "" : " AND `quotesC`.`strike` = ?";
-        sqlExit += tstrat.deltaD == null ? "" : " AND `quotesD`.`strike` = ?";        
+        sqlExit += tstrat.deltaA == null ? "" : " AND quotesA.strike = ?";
+        sqlExit += tstrat.deltaB == null ? "" : " AND quotesB.strike = ?";
+        sqlExit += tstrat.deltaC == null ? "" : " AND quotesC.strike = ?";
+        sqlExit += tstrat.deltaD == null ? "" : " AND quotesD.strike = ?";        
 
-        sqlExit += tstrat.deltaA == null ? "" : " AND `quotesA`.`option_type` = ?";
-        sqlExit += tstrat.deltaB == null ? "" : " AND `quotesB`.`option_type` = ?";
-        sqlExit += tstrat.deltaC == null ? "" : " AND `quotesC`.`option_type` = ?";
-        sqlExit += tstrat.deltaD == null ? "" : " AND `quotesD`.`option_type` = ?";                
+        sqlExit += tstrat.deltaA == null ? "" : " AND quotesA.option_type = ?";
+        sqlExit += tstrat.deltaB == null ? "" : " AND quotesB.option_type = ?";
+        sqlExit += tstrat.deltaC == null ? "" : " AND quotesC.option_type = ?";
+        sqlExit += tstrat.deltaD == null ? "" : " AND quotesD.option_type = ?";                
 
         if (tstrat.exitDTE == null && tstrat.exitPercentLoss == null && tstrat.exitPercentProfit == null) {
             // hold to expiry... the data actually might not be too good for this case as you are simulating
             // selling at 15 minutes before close
             sqlExit += " ORDER BY ";
-            if      (tstrat.deltaA != null) sqlExit += "`quotesA`.`quote_date`";
-            else if (tstrat.deltaB != null) sqlExit += "`quotesB`.`quote_date`";
-            else if (tstrat.deltaC != null) sqlExit += "`quotesC`.`quote_date`";
-            else if (tstrat.deltaD != null) sqlExit += "`quotesD`.`quote_date`";
+            if      (tstrat.deltaA != null) sqlExit += "quotesA.quote_date";
+            else if (tstrat.deltaB != null) sqlExit += "quotesB.quote_date";
+            else if (tstrat.deltaC != null) sqlExit += "quotesC.quote_date";
+            else if (tstrat.deltaD != null) sqlExit += "quotesD.quote_date";
             sqlExit += " DESC LIMIT 1";
         } else {
             String sqlExitSub = "";
 
             if (tstrat.exitDTE != null ) {
                 sqlExitSub += !sqlExitSub.isEmpty() ? " OR " : "";
-                if      (tstrat.deltaA != null) sqlExitSub += "`quotesA`.`dte` = ?";
-                else if (tstrat.deltaB != null) sqlExitSub += "`quotesB`.`dte` = ?";
-                else if (tstrat.deltaC != null) sqlExitSub += "`quotesC`.`dte` = ?";
-                else if (tstrat.deltaD != null) sqlExitSub += "`quotesD`.`dte` = ?";
+                if      (tstrat.deltaA != null) sqlExitSub += "quotesA.dte = ?";
+                else if (tstrat.deltaB != null) sqlExitSub += "quotesB.dte = ?";
+                else if (tstrat.deltaC != null) sqlExitSub += "quotesC.dte = ?";
+                else if (tstrat.deltaD != null) sqlExitSub += "quotesD.dte = ?";
             }
 
             if (tstrat.exitPercentLoss != null ) {
                 sqlExitSub += !sqlExitSub.isEmpty() ? " OR " : "";
                 sqlSub = "";
 
-                sqlSub += tstrat.deltaA == null ? "" : (sqlSub.isEmpty() ? "" : " + ") + "? * `quotesA`.`mid_1545`";
-                sqlSub += tstrat.deltaB == null ? "" : (sqlSub.isEmpty() ? "" : " + ") + "? * `quotesB`.`mid_1545`";
-                sqlSub += tstrat.deltaC == null ? "" : (sqlSub.isEmpty() ? "" : " + ") + "? * `quotesC`.`mid_1545`";
-                sqlSub += tstrat.deltaD == null ? "" : (sqlSub.isEmpty() ? "" : " + ") + "? * `quotesD`.`mid_1545`";
+                sqlSub += tstrat.deltaA == null ? "" : (sqlSub.isEmpty() ? "" : " + ") + "? * quotesA.mid_1545";
+                sqlSub += tstrat.deltaB == null ? "" : (sqlSub.isEmpty() ? "" : " + ") + "? * quotesB.mid_1545";
+                sqlSub += tstrat.deltaC == null ? "" : (sqlSub.isEmpty() ? "" : " + ") + "? * quotesC.mid_1545";
+                sqlSub += tstrat.deltaD == null ? "" : (sqlSub.isEmpty() ? "" : " + ") + "? * quotesD.mid_1545";
 
                 sqlExitSub += sqlSub + " < ?";
             }
@@ -291,10 +291,10 @@ public class FourLegBasicController implements ITradeStratController {
                 sqlExitSub += !sqlExitSub.isEmpty() ? " OR " : "";
                 sqlSub = "";
 
-                sqlSub += tstrat.deltaA == null ? "" : (sqlSub.isEmpty() ? "" : " + ") + "? * `quotesA`.`mid_1545`";
-                sqlSub += tstrat.deltaB == null ? "" : (sqlSub.isEmpty() ? "" : " + ") + "? * `quotesB`.`mid_1545`";
-                sqlSub += tstrat.deltaC == null ? "" : (sqlSub.isEmpty() ? "" : " + ") + "? * `quotesC`.`mid_1545`";
-                sqlSub += tstrat.deltaD == null ? "" : (sqlSub.isEmpty() ? "" : " + ") + "? * `quotesD`.`mid_1545`";
+                sqlSub += tstrat.deltaA == null ? "" : (sqlSub.isEmpty() ? "" : " + ") + "? * quotesA.mid_1545";
+                sqlSub += tstrat.deltaB == null ? "" : (sqlSub.isEmpty() ? "" : " + ") + "? * quotesB.mid_1545";
+                sqlSub += tstrat.deltaC == null ? "" : (sqlSub.isEmpty() ? "" : " + ") + "? * quotesC.mid_1545";
+                sqlSub += tstrat.deltaD == null ? "" : (sqlSub.isEmpty() ? "" : " + ") + "? * quotesD.mid_1545";
 
                 sqlExitSub += sqlSub + " > ?";
             }
@@ -302,10 +302,10 @@ public class FourLegBasicController implements ITradeStratController {
             sqlExit += " AND (" + sqlExitSub + ")";
 
             sqlExit += " ORDER BY ";
-            if      (tstrat.deltaA != null) sqlExit += "`quotesA`.`quote_date`";
-            else if (tstrat.deltaB != null) sqlExit += "`quotesB`.`quote_date`";
-            else if (tstrat.deltaC != null) sqlExit += "`quotesC`.`quote_date`";
-            else if (tstrat.deltaD != null) sqlExit += "`quotesD`.`quote_date`";
+            if      (tstrat.deltaA != null) sqlExit += "quotesA.quote_date";
+            else if (tstrat.deltaB != null) sqlExit += "quotesB.quote_date";
+            else if (tstrat.deltaC != null) sqlExit += "quotesC.quote_date";
+            else if (tstrat.deltaD != null) sqlExit += "quotesD.quote_date";
             sqlExit += " LIMIT 1";            
         }
 

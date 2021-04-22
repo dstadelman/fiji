@@ -44,96 +44,96 @@ public class App
             series.add(ReportingController.generateTimeSeries(buyAndHold_portfolioTrades, 0, quoteMap, buyAndHold, oneHundredLot));
         }
 
-        {
-            FourLegBasic fourLegBasic = new FourLegBasic("Short Put Ratio", "^RUT",
-                -.15f,         1,
-                -.3f,         -2,
-                null,       null,
-                null,       null,
-                8, 1, 2.0f, 0.5f);
-            List<PortfolioTrade> portfolioTrades = PortfolioController.execute(new FourLegBasicController(fourLegBasic), 
-                new NLotController(oneLot),
-                quoteMap);
-            series.add(ReportingController.generateTimeSeries(portfolioTrades, 0, quoteMap, fourLegBasic, oneLot));
-        }        
-
-        // {
-        //     FourLegBasic fourLegBasic = new FourLegBasic("Short Put", "^RUT",
-        //         -.3f,         -1,
-        //         null,       null,
-        //         null,       null,
-        //         null,       null,
-        //         45, 21, 2.0f, 0.5f);
-        //     List<PortfolioTrade> portfolioTrades = PortfolioController.execute(new FourLegBasicController(fourLegBasic), 
-        //         new NLotController(oneLot),
-        //         quoteMap);
-        //     series.add(ReportingController.generateTimeSeries(portfolioTrades, 0, quoteMap, fourLegBasic, oneLot));
-        // }
-
         // {
         //     FourLegBasic fourLegBasic = new FourLegBasic("Short Put Ratio", "^RUT",
         //         -.15f,         1,
         //         -.3f,         -2,
         //         null,       null,
         //         null,       null,
-        //         45, 21, 2.0f, 0.5f);
-        //     List<PortfolioTrade> portfolioTrades = PortfolioController.execute(new FourLegBasicController(fourLegBasic), 
-        //         new NLotController(oneLot),
-        //         quoteMap);
-        //     series.add(ReportingController.generateTimeSeries(portfolioTrades, 0, quoteMap, fourLegBasic, oneLot));
-        // }
-
-        // {
-        //     FourLegBasic fourLegBasic = new FourLegBasic("Short Call", "^RUT",
-        //         .3f,         -1,
-        //         null,       null,
-        //         null,       null,
-        //         null,       null,
-        //         45, 21, 2.0f, 0.5f);
-        //     List<PortfolioTrade> portfolioTrades = PortfolioController.execute(new FourLegBasicController(fourLegBasic), 
-        //         new NLotController(oneLot),
-        //         quoteMap);
-        //     series.add(ReportingController.generateTimeSeries(portfolioTrades, 0, quoteMap, fourLegBasic, oneLot));
-        // }
-
-        // {
-        //     FourLegBasic fourLegBasic = new FourLegBasic("Short Call Ratio", "^RUT",
-        //         .15f,         1,
-        //         .3f,         -2,
-        //         null,       null,
-        //         null,       null,
-        //         45, 21, 2.0f, 0.5f);
+        //         8, 1, 2.0f, 0.5f);
         //     List<PortfolioTrade> portfolioTrades = PortfolioController.execute(new FourLegBasicController(fourLegBasic), 
         //         new NLotController(oneLot),
         //         quoteMap);
         //     series.add(ReportingController.generateTimeSeries(portfolioTrades, 0, quoteMap, fourLegBasic, oneLot));
         // }        
 
-        // {
-        //     FourLegBasic fourLegBasic = new FourLegBasic("Strangle", "^RUT",
-        //         -.3f,         -1,
-        //          .3f,         -1,
-        //         null,       null,
-        //         null,       null,
-        //         45, 21, 2.0f, 0.5f);
-        //     List<PortfolioTrade> portfolioTrades = PortfolioController.execute(new FourLegBasicController(fourLegBasic), 
-        //         new NLotController(oneLot),
-        //         quoteMap);
-        //     series.add(ReportingController.generateTimeSeries(portfolioTrades, 0, quoteMap, fourLegBasic, oneLot));
-        // }
+        {
+            FourLegBasic fourLegBasic = new FourLegBasic("Short Put", "^RUT",
+                -.3f,         -1,
+                null,       null,
+                null,       null,
+                null,       null,
+                45, 21, 2.0f, 0.5f);
+            List<PortfolioTrade> portfolioTrades = PortfolioController.execute(new FourLegBasicController(fourLegBasic), 
+                new NLotController(oneLot),
+                quoteMap);
+            series.add(ReportingController.generateTimeSeries(portfolioTrades, 0, quoteMap, fourLegBasic, oneLot));
+        }
+
+        {
+            FourLegBasic fourLegBasic = new FourLegBasic("Short Put Ratio", "^RUT",
+                -.15f,         1,
+                -.3f,         -2,
+                null,       null,
+                null,       null,
+                45, 21, 2.0f, 0.5f);
+            List<PortfolioTrade> portfolioTrades = PortfolioController.execute(new FourLegBasicController(fourLegBasic), 
+                new NLotController(oneLot),
+                quoteMap);
+            series.add(ReportingController.generateTimeSeries(portfolioTrades, 0, quoteMap, fourLegBasic, oneLot));
+        }
+
+        {
+            FourLegBasic fourLegBasic = new FourLegBasic("Short Call", "^RUT",
+                .3f,         -1,
+                null,       null,
+                null,       null,
+                null,       null,
+                45, 21, 2.0f, 0.5f);
+            List<PortfolioTrade> portfolioTrades = PortfolioController.execute(new FourLegBasicController(fourLegBasic), 
+                new NLotController(oneLot),
+                quoteMap);
+            series.add(ReportingController.generateTimeSeries(portfolioTrades, 0, quoteMap, fourLegBasic, oneLot));
+        }
+
+        {
+            FourLegBasic fourLegBasic = new FourLegBasic("Short Call Ratio", "^RUT",
+                .15f,         1,
+                .3f,         -2,
+                null,       null,
+                null,       null,
+                45, 21, 2.0f, 0.5f);
+            List<PortfolioTrade> portfolioTrades = PortfolioController.execute(new FourLegBasicController(fourLegBasic), 
+                new NLotController(oneLot),
+                quoteMap);
+            series.add(ReportingController.generateTimeSeries(portfolioTrades, 0, quoteMap, fourLegBasic, oneLot));
+        }        
+
+        {
+            FourLegBasic fourLegBasic = new FourLegBasic("Strangle", "^RUT",
+                -.3f,         -1,
+                 .3f,         -1,
+                null,       null,
+                null,       null,
+                45, 21, 2.0f, 0.5f);
+            List<PortfolioTrade> portfolioTrades = PortfolioController.execute(new FourLegBasicController(fourLegBasic), 
+                new NLotController(oneLot),
+                quoteMap);
+            series.add(ReportingController.generateTimeSeries(portfolioTrades, 0, quoteMap, fourLegBasic, oneLot));
+        }
         
-        // {
-        //     FourLegBasic fourLegBasic = new FourLegBasic("Short Double Ratio (BATMAN)", "^RUT",
-        //         -.15f,         1,
-        //         -.3f,         -2,            
-        //          .3f,         -2,
-        //          .15f,         1,
-        //         45, 21, 2.0f, 0.5f);
-        //     List<PortfolioTrade> portfolioTrades = PortfolioController.execute(new FourLegBasicController(fourLegBasic), 
-        //         new NLotController(oneLot),
-        //         quoteMap);
-        //     series.add(ReportingController.generateTimeSeries(portfolioTrades, 0, quoteMap, fourLegBasic, oneLot));
-        // }                
+        {
+            FourLegBasic fourLegBasic = new FourLegBasic("Short Double Ratio (BATMAN)", "^RUT",
+                -.15f,         1,
+                -.3f,         -2,            
+                 .3f,         -2,
+                 .15f,         1,
+                45, 21, 2.0f, 0.5f);
+            List<PortfolioTrade> portfolioTrades = PortfolioController.execute(new FourLegBasicController(fourLegBasic), 
+                new NLotController(oneLot),
+                quoteMap);
+            series.add(ReportingController.generateTimeSeries(portfolioTrades, 0, quoteMap, fourLegBasic, oneLot));
+        }                
 
         // ****************************************************************************************
         SwingUtilities.invokeLater(() -> {

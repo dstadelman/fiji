@@ -1,5 +1,5 @@
 
 
-pgsql-url=jdbc:postgresql://localhost:3306/fiji
-pgsql-user=root
+pgsql-url=jdbc:postgresql://127.0.0.1/fiji
+pgsql-user=postgres
 pgsql-pass=!password here!
