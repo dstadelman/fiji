@@ -19,3 +19,6 @@ hibernate.cfg.xml
 
 # little helper script
 quick_up.sh
+
+# my quotes import sql
+quotes_import_csv.sql
