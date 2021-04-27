@@ -56,7 +56,7 @@ public class FourLegBasic implements IDescription {
 
         this.name = name;
 
-        // default configuration is a batman (good for testing)
+        // default configuration is a double ratio spread (good for testing)
 
         this.underlying_symbol = underlying_symbol;
 
