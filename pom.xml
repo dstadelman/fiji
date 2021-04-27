@@ -79,6 +79,27 @@
       <version>42.2.19</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.jline/jline -->
+    <dependency>
+      <groupId>org.jline</groupId>
+      <artifactId>jline</artifactId>
+      <version>3.19.0</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.jline/jline-terminal-jansi -->
+    <dependency>
+      <groupId>org.jline</groupId>
+      <artifactId>jline-terminal-jansi</artifactId>
+      <version>3.19.0</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.jline/jline-groovy -->
+    <dependency>
+      <groupId>org.jline</groupId>
+      <artifactId>jline-groovy</artifactId>
+      <version>3.19.0</version>
+    </dependency>
+
   </dependencies>
 
   <build>
