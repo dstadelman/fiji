@@ -123,7 +123,7 @@ public class App
         // }
         
         // {
-        //     FourLegBasic fourLegBasic = new FourLegBasic("Short Double Ratio (BATMAN)", "^RUT",
+        //     FourLegBasic fourLegBasic = new FourLegBasic("Short Double Ratio", "^RUT",
         //         -.15f,         1,
         //         -.3f,         -2,            
         //          .3f,         -2,
