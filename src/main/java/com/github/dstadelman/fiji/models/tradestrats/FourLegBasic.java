@@ -79,11 +79,15 @@ public class FourLegBasic implements IDescription {
 
     @Override
     public String getDescription() {
+
+        String delta = "";
+        delta += (deltaA != null && quantityA != null && quantityA != 0 ? String.format("%s%d @ %.02fΔ", delta.isEmpty() ? "" : "; ", quantityA, deltaA) : "");
+        delta += (deltaB != null && quantityB != null && quantityB != 0 ? String.format("%s%d @ %.02fΔ", delta.isEmpty() ? "" : "; ", quantityB, deltaB) : "");
+        delta += (deltaC != null && quantityC != null && quantityC != 0 ? String.format("%s%d @ %.02fΔ", delta.isEmpty() ? "" : "; ", quantityC, deltaC) : "");
+        delta += (deltaD != null && quantityD != null && quantityD != 0 ? String.format("%s%d @ %.02fΔ", delta.isEmpty() ? "" : "; ", quantityD, deltaD) : "");
+
         return underlying_symbol + ": " + name + " ("
-        +   (deltaA != null && quantityA != null && quantityA != 0 ? String.format("%d @ %.02fΔ ", quantityA, deltaA) : "")
-        +   (deltaB != null && quantityB != null && quantityB != 0 ? String.format("%d @ %.02fΔ ", quantityB, deltaB) : "")
-        +   (deltaC != null && quantityC != null && quantityC != 0 ? String.format("%d @ %.02fΔ ", quantityC, deltaC) : "")
-        +   (deltaD != null && quantityD != null && quantityD != 0 ? String.format("%d @ %.02fΔ ", quantityD, deltaD) : "")
+        +   delta
         +   (entryDTE != null && entryDTE > 0 ? String.format(", %d-", entryDTE) : "E")
         +   (exitDTE != null && exitDTE > 0 ? String.format("%d", exitDTE) : "0") + " DTE"
         +   (exitPercentProfit != null ? String.format(", %.02f%% profit", exitPercentProfit * 100) : "")
