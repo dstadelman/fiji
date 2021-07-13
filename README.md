@@ -11,7 +11,7 @@ Currently supported trades
 * Call (Short/Long)
 * Strangle (Short/Long)
 
-Fiji is tightly coupled with hibernate + MySQL 8 queries - as a software engineer, this is gross, but speed of implementation is priority over "really nice code."
+Fiji is tightly coupled with hibernate + postgreSQL - as a software engineer, this is gross, but speed of implementation is priority over "really nice code."
 
 ## DISCLAIMER 
 
@@ -41,8 +41,6 @@ https://datashop.cboe.com/option-quotes-end-of-day-with-calcs
 https://python-backtest.blogspot.com/2019/10/cboe-data-review.html?m=1
 
 ### Java Reference
-
-https://www.baeldung.com/java-connect-mysql
 
 https://www.baeldung.com/thread-pool-java-and-guava
 
